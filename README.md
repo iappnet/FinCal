@@ -1,4 +1,4 @@
-# calculator_app
+# FinCal
 
 A new Flutter project.
 
