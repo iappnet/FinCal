@@ -1,4 +1,4 @@
-# FinCal
+# Finance Calculator project
 
 A new Flutter project.
 
