@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
@@ -13,6 +14,7 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 
 import '../models/calculation_model.dart';
 import '../services/database_helper.dart';
+import '../controllers/settings_controller.dart';
 
 class SalaryCalculationController extends GetxController {
   // Reactive variables
@@ -377,21 +379,20 @@ class SalaryCalculationController extends GetxController {
 
   Future<void> shareResults(GlobalKey repaintBoundaryKey) async {
     try {
+      // Access the SettingsController to read the auto-save preference
+      final settingsController = Get.find<SettingsController>();
+      final autoSaveEnabled = settingsController.isAutoSaveImage.value;
+      // Check user preference for auto-save
+
       // Generate PDF
       final pdfPath = await saveResultsAsPDF();
 
       // Generate JPEG
-      final boundary = repaintBoundaryKey.currentContext?.findRenderObject()
-          as RenderRepaintBoundary;
-      final image = await boundary.toImage(pixelRatio: 3.0);
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      final pngBytes = byteData!.buffer.asUint8List();
-      final result = await ImageGallerySaver.saveImage(pngBytes, quality: 100);
-      bool success = result['isSuccess'] ?? false;
-
       String? jpgPath;
-      if (success) {
-        jpgPath = result['filePath'] ?? result['file'];
+      if (autoSaveEnabled == 'true') {
+        jpgPath = await saveResultsAsJPEG(repaintBoundaryKey, autoSave: true);
+      } else {
+        jpgPath = await saveResultsAsJPEG(repaintBoundaryKey, autoSave: false);
       }
 
       // Generate Text
@@ -408,16 +409,59 @@ Post-Deduction Total: SAR ${postDeductionTotal.toStringAsFixed(2)}
 Generated on: ${DateTime.now().toLocal()}
 ''';
 
-      // Prepare Files and Text
-      final files = <XFile>[
-        XFile(pdfPath, name: 'Calculation_Report.pdf'),
-        if (jpgPath != null) XFile(jpgPath, name: 'Calculation_Report.jpg'),
-      ];
+      // // Prepare files for sharing
+      // final files = <XFile>[
+      //   XFile(pdfPath, name: 'Calculation_Report.pdf'),
+      //   if (jpgPath != null) XFile(jpgPath, name: 'Calculation_Report.jpg'),
+      // ];
 
-      // Show Share Sheet
-      Share.shareXFiles(
-        files,
-        text: textDetails,
+      // // Show Share Sheet
+      // Share.shareXFiles(
+      //   files,
+      //   text: textDetails,
+      // );
+
+      // Show dialog for user to choose action
+      await Get.defaultDialog(
+        title: "Share Calculation",
+        content: Column(
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                // Share as text
+                Share.share(textDetails, subject: "Salary Calculation Report");
+                Get.back(); // Close dialog
+              },
+              child: Text("Share as Text"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Copy text to clipboard
+                Clipboard.setData(ClipboardData(text: textDetails));
+                Get.snackbar(
+                    "Copied", "Calculation details copied to clipboard");
+                Get.back(); // Close dialog
+              },
+              child: Text("Copy to Clipboard"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Share files (PDF and/or JPEG)
+                final files = <XFile>[
+                  XFile(pdfPath, name: 'Calculation_Report.pdf'),
+                  if (jpgPath != null)
+                    XFile(jpgPath, name: 'Calculation_Report.jpg'),
+                ];
+                Share.shareXFiles(
+                  files,
+                  text: textDetails,
+                );
+                Get.back(); // Close dialog
+              },
+              child: Text("Share Files"),
+            ),
+          ],
+        ),
       );
     } catch (e) {
       Get.snackbar('Error', 'An error occurred while sharing: $e');
@@ -495,38 +539,8 @@ Generated on: ${DateTime.now().toLocal()}
     return filePath;
   }
 
-  // Future<void> saveResultsAsPDF() async {
-  //   final pdf = pw.Document();
-  //   pdf.addPage(pw.Page(
-  //     build: (context) => pw.Column(
-  //       crossAxisAlignment: pw.CrossAxisAlignment.start,
-  //       children: [
-  //         pw.Text('Salary Results',
-  //             style:
-  //                 pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
-  //         pw.Text('Base Salary: SAR ${baseSalary.value}'),
-  //         pw.Text('Housing Allowance: SAR $housingAllowanceAmount'),
-  //         pw.Text(
-  //             'Transportation Allowance: SAR $transportationAllowanceAmount'),
-  //         pw.Text('Social Security Deduction: SAR $socialSecurityAmount'),
-  //         pw.Text('Pre-Deduction Total: SAR $preDeductionTotal'),
-  //         pw.Text('Post-Deduction Total: SAR $postDeductionTotal'),
-  //       ],
-  //     ),
-  //   ));
-
-  //   final directory = await getApplicationDocumentsDirectory();
-  //   final filePath = '${directory.path}/salary_results.pdf';
-  //   final file = File(filePath);
-  //   await file.writeAsBytes(await pdf.save());
-
-  //   // Use Share plugin to open the share sheet
-  //   Share.shareXFiles([XFile(filePath)],
-  //       text: 'Here is your salary PDF report.');
-  // }
-
-  // Save results as JPEG
-  Future<void> saveResultsAsJPEG(GlobalKey repaintBoundaryKey) async {
+  Future<String?> saveResultsAsJPEG(GlobalKey repaintBoundaryKey,
+      {bool autoSave = false}) async {
     try {
       // Capture the image
       final boundary = repaintBoundaryKey.currentContext?.findRenderObject()
@@ -535,41 +549,31 @@ Generated on: ${DateTime.now().toLocal()}
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       final pngBytes = byteData!.buffer.asUint8List();
 
-      // Save the image to Photos app
-      final result = await ImageGallerySaver.saveImage(pngBytes, quality: 100);
-      bool success = result['isSuccess'] ?? false;
+      if (autoSave) {
+        // Save the image to Photos
+        final result =
+            await ImageGallerySaver.saveImage(pngBytes, quality: 100);
+        bool success = result['isSuccess'] ?? false;
 
-      if (success) {
-        Get.snackbar('Success', 'Image saved to Photos successfully.');
-
-        // Trigger share sheet
-        final filePath = result['filePath'] ?? result['file'];
-        if (filePath != null) {
-          Share.shareXFiles([XFile(filePath)],
-              text: 'Here is your salary JPEG report.');
+        if (success) {
+          Get.snackbar('Success', 'Image saved to Photos successfully.');
+          return result['filePath'] ?? result['file'];
+        } else {
+          Get.snackbar('Error', 'Failed to save the image.');
+          return null;
         }
       } else {
-        Get.snackbar('Error', 'Failed to save the image.');
+        // Save the image temporarily
+        final directory = await getTemporaryDirectory();
+        final filePath = '${directory.path}/Calculation_Report.png';
+        final file = File(filePath);
+        await file.writeAsBytes(pngBytes);
+
+        return filePath;
       }
     } catch (e) {
       Get.snackbar('Error', 'An error occurred while saving JPEG: $e');
+      return null;
     }
   }
-
-  // Future<void> saveResultsAsJPEG(GlobalKey repaintBoundaryKey) async {
-  //   try {
-  //     final boundary = repaintBoundaryKey.currentContext?.findRenderObject()
-  //         as RenderRepaintBoundary;
-  //     final image = await boundary.toImage();
-  //     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-  //     final bytes = byteData!.buffer.asUint8List();
-
-  //     final directory = await getApplicationDocumentsDirectory();
-  //     final file = File('${directory.path}/salary_results.png');
-  //     await file.writeAsBytes(bytes);
-  //     Get.snackbar('Success', 'JPEG saved to ${file.path}');
-  //   } catch (e) {
-  //     Get.snackbar('Error', 'Failed to save JPEG: $e');
-  //   }
-  // }
 }

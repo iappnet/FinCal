@@ -4,6 +4,7 @@ import '../controllers/salary_calculation_controller.dart';
 import '../models/allowance_model.dart';
 import '../utils/decimal_formatter.dart';
 import '../utils/shared_appbar.dart';
+import '../utils/shared_bottom_navbar.dart';
 
 class SalaryCalculationScreen extends StatelessWidget {
   final SalaryCalculationController controller =
@@ -22,7 +23,7 @@ class SalaryCalculationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: SharedAppBar(
-        title: 'Salary Calculator',
+        title: 'salary_calculation'.tr,
         gradient: LinearGradient(
           colors: [Colors.blueAccent, Colors.purpleAccent],
           begin: Alignment.topLeft,
@@ -43,7 +44,7 @@ class SalaryCalculationScreen extends StatelessWidget {
                 textInputAction: TextInputAction
                     .done, // Adds a 'Done' button to the keyboard
                 decoration: InputDecoration(
-                  labelText: 'Base Salary',
+                  labelText: 'base_salary'.tr,
                   suffixIcon: IconButton(
                     icon: Icon(Icons.done),
                     onPressed: () {
@@ -63,7 +64,7 @@ class SalaryCalculationScreen extends StatelessWidget {
               // Toggle for Raise
               Obx(() => Row(
                     children: [
-                      Text("Received Raise?"),
+                      Text("received_raise".tr),
                       Spacer(),
                       Switch(
                         value: controller.hasRaise.value,
@@ -90,7 +91,7 @@ class SalaryCalculationScreen extends StatelessWidget {
                           DecimalInputFormatter(decimalPlaces: 2)
                         ],
                         decoration: InputDecoration(
-                          labelText: 'Raise Percentage (%)',
+                          labelText: 'raise_percentage'.tr,
                           suffixIcon: IconButton(
                             icon: Icon(Icons.done),
                             onPressed: () {
@@ -110,12 +111,12 @@ class SalaryCalculationScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 10),
                       Text(
-                        "Raise Amount: SAR ${controller.raiseAmount.value.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
+                        "${'raise_amount'.tr}: ${'sar'.tr} ${controller.raiseAmount.value.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 5),
                       Text(
-                        "New Base Salary: SAR ${controller.baseSalary.value.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
+                        "${'new_base_salary'.tr}: ${'sar'.tr} ${controller.baseSalary.value.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -149,7 +150,7 @@ class SalaryCalculationScreen extends StatelessWidget {
                               decimalPlaces: 2) // Ensures correct format
                         ],
                         decoration: InputDecoration(
-                          labelText: 'Housing Allowance (%)',
+                          labelText: 'housing_allowance'.tr,
                           suffixIcon: IconButton(
                             icon: Icon(Icons.done),
                             onPressed: () {
@@ -200,7 +201,7 @@ class SalaryCalculationScreen extends StatelessWidget {
                     ),
                     SizedBox(width: 10),
                     Text(
-                      "SAR ${controller.housingAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
+                      "${'sar'.tr} ${controller.housingAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -229,7 +230,7 @@ class SalaryCalculationScreen extends StatelessWidget {
                           DecimalInputFormatter(decimalPlaces: 2)
                         ],
                         decoration: InputDecoration(
-                          labelText: 'Transportation Allowance (%)',
+                          labelText: 'transportation_allowance'.tr,
                           suffixIcon: IconButton(
                             icon: Icon(Icons.done),
                             onPressed: () {
@@ -276,7 +277,7 @@ class SalaryCalculationScreen extends StatelessWidget {
                     ),
                     SizedBox(width: 10),
                     Text(
-                      "SAR ${controller.transportationAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
+                      "${'sar'.tr} ${controller.transportationAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -306,7 +307,7 @@ class SalaryCalculationScreen extends StatelessWidget {
                           DecimalInputFormatter(decimalPlaces: 2)
                         ],
                         decoration: InputDecoration(
-                          labelText: 'Social Insurance (%)',
+                          labelText: 'social_insurance'.tr,
                           suffixIcon: IconButton(
                             icon: Icon(Icons.done),
                             onPressed: () {
@@ -353,7 +354,7 @@ class SalaryCalculationScreen extends StatelessWidget {
                     ),
                     SizedBox(width: 10),
                     Text(
-                      "SAR ${controller.socialSecurityAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
+                      "${'sar'.tr} ${controller.socialSecurityAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -372,7 +373,7 @@ class SalaryCalculationScreen extends StatelessWidget {
                           var allowance = entry.value;
                           return ListTile(
                             title: Text(
-                                '${allowance.name}: ${allowance.type == AllowanceType.fixed ? "SAR ${allowance.value.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}" : "${allowance.percentageInput?.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}% → SAR ${allowance.value}"}'),
+                                '${allowance.name}: ${allowance.type == AllowanceType.fixed ? "${'sar'.tr} ${allowance.value.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}" : "${allowance.percentageInput?.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}% → ${'sar'.tr} ${allowance.value}"}'),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -404,7 +405,9 @@ class SalaryCalculationScreen extends StatelessWidget {
                       width: double.infinity, // Makes the box take full width
                       padding: const EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
-                        color: Colors.grey[200],
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey[800]
+                            : Colors.grey[200], // Darker shade for dark mode
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
@@ -421,79 +424,53 @@ class SalaryCalculationScreen extends StatelessWidget {
                           // Conditional New Base Salary Display
                           _buildResultRow(
                             controller.hasRaise.value
-                                ? 'New Base Salary'
-                                : 'Base Salary',
-                            'SAR ${controller.baseSalary.value.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
-                            // isBold: true,
+                                ? 'new_base_salary'.tr
+                                : 'base_salary'.tr,
+                            '${'sar'.tr} ${controller.baseSalary.value.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
+                            isBold: true,
+                            context: context,
                           ),
                           _buildResultRow(
-                            'Housing Allowance',
-                            'SAR ${controller.housingAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
+                            'housing_allowance_amount'.tr,
+                            '${'sar'.tr} ${controller.housingAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
+                            isBold: true,
+                            context: context,
                           ),
                           _buildResultRow(
-                            'Transportation Allowance',
-                            'SAR ${controller.transportationAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
+                            'transportation_allowance_amount'.tr,
+                            '${'sar'.tr} ${controller.transportationAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
+                            isBold: true,
+                            context: context,
                           ),
                           _buildResultRow(
-                            'Social Insurance Deduction',
-                            'SAR ${controller.socialSecurityAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
+                            'social_insurance_deduction_amount'.tr,
+                            '${'sar'.tr} ${controller.socialSecurityAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
+                            isBold: true,
+                            context: context,
                           ),
                           ...controller.allowances
                               .map((allowance) => _buildResultRow(
                                     allowance.name,
-                                    'SAR ${allowance.value.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
+                                    '${'sar'.tr} ${allowance.value.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
+                                    isBold: true,
+                                    context: context,
                                   )),
                           _buildResultRow(
-                            'Pre-Deduction Total',
-                            'SAR ${controller.preDeductionTotal.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
+                            'pre_deduction_total'.tr,
+                            '${'sar'.tr} ${controller.preDeductionTotal.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
+                            isBold: true,
+                            context: context,
                           ),
                           _buildResultRow(
-                            'Post-Deduction Total',
-                            'SAR ${controller.postDeductionTotal.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
+                            'post_deduction_total'.tr,
+                            '${'sar'.tr} ${controller.postDeductionTotal.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
+                            isBold: true,
+                            context: context,
                           ),
                         ],
                       ),
                     ),
                   )),
-
-              // Obx(() => RepaintBoundary(
-              //       key: _resultsKey,
-              //       child: Container(
-              //         padding: const EdgeInsets.all(16.0),
-              //         decoration: BoxDecoration(
-              //           color: Colors.grey[200],
-              //           borderRadius: BorderRadius.circular(10),
-              //         ),
-              //         child: Column(
-              //           crossAxisAlignment: CrossAxisAlignment.start,
-              //           children: [
-              //             // Conditional New Base Salary Display
-              //             if (controller.hasRaise.value)
-              //               Text(
-              //                 'New Base Salary: SAR ${controller.baseSalary.value.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
-              //                 style: TextStyle(fontWeight: FontWeight.bold),
-              //               )
-              //             else
-              //               Text(
-              //                 'Base Salary: SAR ${controller.baseSalary.value.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
-              //                 style: TextStyle(fontWeight: FontWeight.bold),
-              //               ),
-              //             Text(
-              //                 'Housing Allowance: SAR ${controller.housingAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}'),
-              //             Text(
-              //                 'Transportation Allowance: SAR ${controller.transportationAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}'),
-              //             Text(
-              //                 'Social Insurance Deduction: SAR ${controller.socialSecurityAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}'),
-              //             ...controller.allowances.map((allowance) => Text(
-              //                 '${allowance.name}: SAR ${allowance.value.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}}')),
-              //             Text(
-              //                 'Pre-Deduction Total: SAR ${controller.preDeductionTotal.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}'),
-              //             Text(
-              //                 'Post-Deduction Total: SAR ${controller.postDeductionTotal.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}'),
-              //           ],
-              //         ),
-              //       ),
-              //     )),
 
               SizedBox(height: 20),
 
@@ -503,21 +480,13 @@ class SalaryCalculationScreen extends StatelessWidget {
                 children: [
                   ElevatedButton(
                     onPressed: () => controller.shareResults(_resultsKey),
-                    child: Text('Share Calculation'),
+                    child: Text('share_calculation'.tr),
                   ),
-                  // ElevatedButton(
-                  //   onPressed: () => controller.saveResultsAsPDF(),
-                  //   child: Text('Save as PDF'),
-                  // ),
-                  // ElevatedButton(
-                  //   onPressed: () => controller.saveResultsAsJPEG(_resultsKey),
-                  //   child: Text('Save as JPEG'),
-                  // ),
                   ElevatedButton(
                     onPressed: () {
                       controller.saveCalculation('Salary Calculation');
                     },
-                    child: Text('Save Calculation'),
+                    child: Text('save_calculation'.tr),
                   ),
                 ],
               ),
@@ -529,10 +498,31 @@ class SalaryCalculationScreen extends StatelessWidget {
         onPressed: () => controller.addAllowance(context),
         child: Icon(Icons.add),
       ),
+      bottomNavigationBar: SharedBottomNavBar(
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'home'.tr,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calculate),
+            label: 'salary_calculation'.tr,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: 'history'.tr,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'settings'.tr,
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildResultRow(String label, String value, {bool isBold = false}) {
+  Widget _buildResultRow(String label, String value,
+      {bool isBold = false, required BuildContext context}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
@@ -544,6 +534,9 @@ class SalaryCalculationScreen extends StatelessWidget {
               style: TextStyle(
                 fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
                 fontSize: 16.0,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black, // Adjust text color for dark mode
               ),
             ),
           ),
@@ -552,6 +545,9 @@ class SalaryCalculationScreen extends StatelessWidget {
             style: TextStyle(
               fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
               fontSize: 16.0,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black, // Adjust text color for dark mode
             ),
           ),
         ],

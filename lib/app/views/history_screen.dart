@@ -11,14 +11,14 @@ class HistoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Calculation History'),
+        title: Text('calculation_history'.tr), // Localized
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
           return Center(child: CircularProgressIndicator());
         }
         if (controller.calculations.isEmpty) {
-          return Center(child: Text('No calculations saved.'));
+          return Center(child: Text('no_calculations_saved'.tr)); // Localized
         }
         return ListView.builder(
           itemCount: controller.calculations.length,
@@ -46,15 +46,15 @@ class HistoryScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text("Delete Calculation"),
-        content: Text("Are you sure you want to delete this calculation?"),
+        title: Text("delete_calculation".tr), // Localized
+        content: Text("delete_confirmation".tr), // Localized
         actions: [
           TextButton(
-            child: Text("Cancel"),
+            child: Text("delete_confirmation".tr), // Localized
             onPressed: () => Navigator.of(ctx).pop(),
           ),
           TextButton(
-            child: Text("Delete"),
+            child: Text("delete".tr), // Localized
             onPressed: () {
               controller.deleteCalculation(id);
               Navigator.of(ctx).pop();

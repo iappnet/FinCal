@@ -11,14 +11,15 @@ class CalculationDetailsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${calculation.calculationType} Details'),
+        title:
+            Text('${calculation.calculationType} ${'details'.tr}'), // Localized
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Calculation Date: ${calculation.date.toLocal()}',
+            Text('${'calculation_date'.tr}: ${calculation.date.toLocal()}',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(height: 16),
             ...calculation.details.entries.map((entry) {

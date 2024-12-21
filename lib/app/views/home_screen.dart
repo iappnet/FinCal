@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/home_controller.dart';
+import '../controllers/settings_controller.dart';
 import '../routes/app_pages.dart';
 import '../utils/shared_appbar.dart';
 
 class HomeScreen extends StatelessWidget {
   final HomeController controller = Get.put(HomeController());
+  final SettingsController settingsController =
+      Get.find<SettingsController>(); // Use the existing SettingsController
 
   HomeScreen({super.key});
 
@@ -13,7 +16,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: SharedAppBar(
-        title: 'Financial Tools',
+        title: 'app_title'.tr,
         gradient: LinearGradient(
           colors: [Colors.blueAccent, Colors.purpleAccent],
           begin: Alignment.topLeft,
@@ -30,13 +33,20 @@ class HomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Welcome Section
-            Text(
-              'Welcome back!',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
+            Obx(() {
+              final greeting = settingsController.isFirstUse.value
+                  ? 'welcome'.tr
+                  : 'welcome_back'.trParams({
+                      'username': settingsController.username.value,
+                    });
+              return Text(
+                greeting,
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              );
+            }),
             SizedBox(height: 8),
             Text(
-              "Today is ${DateTime.now().toLocal().toString().split(' ')[0]}",
+              "${'today_is'.tr} ${DateTime.now().toLocal().toString().split(' ')[0]}",
               style: TextStyle(fontSize: 16, color: Colors.grey[600]),
             ),
             SizedBox(height: 16),
@@ -50,8 +60,8 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   _buildNavigationCard(
                     context,
-                    title: 'Salary Calculation',
-                    description: 'Calculate your salary breakdown.',
+                    title: 'salary_calculation'.tr,
+                    description: 'calculate_salary_description'.tr,
                     icon: Icons.account_balance_wallet,
                     onTap: () {
                       Get.toNamed(Routes.salaryCalculation);
@@ -77,11 +87,11 @@ class HomeScreen extends StatelessWidget {
                   // ),
                   _buildNavigationCard(
                     context,
-                    title: 'More Features',
-                    description: 'Coming soon...',
+                    title: 'more_features'.tr,
+                    description: 'coming_soon'.tr,
                     icon: Icons.more_horiz,
                     onTap: () {
-                      Get.snackbar('Info', 'More features coming soon!');
+                      Get.snackbar('info'.tr, 'more_features_coming_soon'.tr);
                     },
                   ),
                 ],
@@ -146,7 +156,7 @@ class HomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Most Recent Summary',
+              'most_recent_summary'.tr,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
@@ -156,7 +166,7 @@ class HomeScreen extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Calculation Type: ${summary.calculationType}'),
+                  Text('${'calculation_type'.tr}: ${summary.calculationType}'),
                 ],
               );
             }),
