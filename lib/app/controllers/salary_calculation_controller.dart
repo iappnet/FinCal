@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:pdf/pdf.dart';
 import '../models/allowance_model.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
@@ -9,7 +11,10 @@ import 'package:flutter/rendering.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 
-class MainController extends GetxController {
+import '../models/calculation_model.dart';
+import '../services/database_helper.dart';
+
+class SalaryCalculationController extends GetxController {
   // Reactive variables
   var baseSalary = 0.0.obs;
   var socialinsurancePercentage = 9.75.obs;
@@ -333,35 +338,161 @@ class MainController extends GetxController {
     );
   }
 
-// Save results as PDF
-  Future<void> saveResultsAsPDF() async {
+  Future<void> saveCalculation(String calculationType) async {
+    final details = {
+      'Base Salary': baseSalary.value,
+      'Housing Allowance': housingAllowanceAmount,
+      'Transportation Allowance': transportationAllowanceAmount,
+      'Custom Allowances': allowances
+          .map((a) => {
+                'Name': a.name,
+                'Value': a.value,
+                'Type': a.type.toString(),
+              })
+          .toList(),
+      'Social Insurance Deduction': socialSecurityAmount,
+      'Pre-Deduction Total': preDeductionTotal,
+      'Post-Deduction Total': postDeductionTotal,
+    };
+
+    final calculation = CalculationModel(
+      calculationType: calculationType,
+      details: details,
+      date: DateTime.now(),
+    );
+
+    await DatabaseHelper().insertCalculation(calculation);
+    Get.snackbar('Success', '$calculationType saved successfully!');
+  }
+
+  Future<void> fetchSavedCalculations() async {
+    final calculations = await DatabaseHelper().fetchCalculations();
+    for (var calc in calculations) {
+      if (kDebugMode) {
+        print(
+            'ID: ${calc.id}, Type: ${calc.calculationType}, Details: ${calc.details}');
+      }
+    }
+  }
+
+  Future<void> shareResults(GlobalKey repaintBoundaryKey) async {
+    try {
+      // Generate PDF
+      final pdfPath = await saveResultsAsPDF();
+
+      // Generate JPEG
+      final boundary = repaintBoundaryKey.currentContext?.findRenderObject()
+          as RenderRepaintBoundary;
+      final image = await boundary.toImage(pixelRatio: 3.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final pngBytes = byteData!.buffer.asUint8List();
+      final result = await ImageGallerySaver.saveImage(pngBytes, quality: 100);
+      bool success = result['isSuccess'] ?? false;
+
+      String? jpgPath;
+      if (success) {
+        jpgPath = result['filePath'] ?? result['file'];
+      }
+
+      // Generate Text
+      final textDetails = '''
+Salary Calculation Report
+----------------------------
+Base Salary: SAR ${baseSalary.value.toStringAsFixed(2)}
+Housing Allowance: SAR ${housingAllowanceAmount.toStringAsFixed(2)}
+Transportation Allowance: SAR ${transportationAllowanceAmount.toStringAsFixed(2)}
+Social Security Deduction: SAR ${socialSecurityAmount.toStringAsFixed(2)}
+Pre-Deduction Total: SAR ${preDeductionTotal.toStringAsFixed(2)}
+Post-Deduction Total: SAR ${postDeductionTotal.toStringAsFixed(2)}
+
+Generated on: ${DateTime.now().toLocal()}
+''';
+
+      // Prepare Files and Text
+      final files = <XFile>[
+        XFile(pdfPath, name: 'Calculation_Report.pdf'),
+        if (jpgPath != null) XFile(jpgPath, name: 'Calculation_Report.jpg'),
+      ];
+
+      // Show Share Sheet
+      Share.shareXFiles(
+        files,
+        text: textDetails,
+      );
+    } catch (e) {
+      Get.snackbar('Error', 'An error occurred while sharing: $e');
+    }
+  }
+
+  Future<String> saveResultsAsPDF() async {
     final pdf = pw.Document();
-    pdf.addPage(pw.Page(
-      build: (context) => pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
-        children: [
-          pw.Text('Salary Results',
-              style:
-                  pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
-          pw.Text('Base Salary: SAR ${baseSalary.value}'),
-          pw.Text('Housing Allowance: SAR $housingAllowanceAmount'),
-          pw.Text(
-              'Transportation Allowance: SAR $transportationAllowanceAmount'),
-          pw.Text('Social Security Deduction: SAR $socialSecurityAmount'),
-          pw.Text('Pre-Deduction Total: SAR $preDeductionTotal'),
-          pw.Text('Post-Deduction Total: SAR $postDeductionTotal'),
-        ],
+
+    pdf.addPage(
+      pw.Page(
+        build: (context) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text(
+              'Salary Calculation Report',
+              style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
+            ),
+            pw.SizedBox(height: 20),
+            pw.Table(
+              border: pw.TableBorder.all(),
+              columnWidths: {
+                0: pw.FlexColumnWidth(2),
+                1: pw.FlexColumnWidth(3),
+              },
+              children: [
+                pw.TableRow(children: [
+                  pw.Text('Description',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                  pw.Text('Amount (SAR)',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                ]),
+                pw.TableRow(children: [
+                  pw.Text('Base Salary'),
+                  pw.Text(baseSalary.value.toStringAsFixed(2)),
+                ]),
+                pw.TableRow(children: [
+                  pw.Text('Housing Allowance'),
+                  pw.Text(housingAllowanceAmount.toStringAsFixed(2)),
+                ]),
+                pw.TableRow(children: [
+                  pw.Text('Transportation Allowance'),
+                  pw.Text(transportationAllowanceAmount.toStringAsFixed(2)),
+                ]),
+                pw.TableRow(children: [
+                  pw.Text('Social Security Deduction'),
+                  pw.Text(socialSecurityAmount.toStringAsFixed(2)),
+                ]),
+                pw.TableRow(children: [
+                  pw.Text('Pre-Deduction Total'),
+                  pw.Text(preDeductionTotal.toStringAsFixed(2)),
+                ]),
+                pw.TableRow(children: [
+                  pw.Text('Post-Deduction Total'),
+                  pw.Text(postDeductionTotal.toStringAsFixed(2)),
+                ]),
+              ],
+            ),
+            pw.SizedBox(height: 20),
+            pw.Text(
+              'Generated on: ${DateTime.now().toLocal()}',
+              style: pw.TextStyle(
+                  fontSize: 12, color: PdfColor.fromHex('#888888')),
+            ),
+          ],
+        ),
       ),
-    ));
+    );
 
     final directory = await getApplicationDocumentsDirectory();
-    final filePath = '${directory.path}/salary_results.pdf';
+    final filePath = '${directory.path}/Calculation_Report.pdf';
     final file = File(filePath);
     await file.writeAsBytes(await pdf.save());
 
-    // Use Share plugin to open the share sheet
-    Share.shareXFiles([XFile(filePath)],
-        text: 'Here is your salary PDF report.');
+    return filePath;
   }
 
   // Future<void> saveResultsAsPDF() async {
@@ -377,20 +508,24 @@ class MainController extends GetxController {
   //         pw.Text('Housing Allowance: SAR $housingAllowanceAmount'),
   //         pw.Text(
   //             'Transportation Allowance: SAR $transportationAllowanceAmount'),
-  //         pw.Text('Social Insurance Deduction: SAR $socialSecurityAmount'),
+  //         pw.Text('Social Security Deduction: SAR $socialSecurityAmount'),
   //         pw.Text('Pre-Deduction Total: SAR $preDeductionTotal'),
   //         pw.Text('Post-Deduction Total: SAR $postDeductionTotal'),
   //       ],
   //     ),
   //   ));
+
   //   final directory = await getApplicationDocumentsDirectory();
-  //   final file = File('${directory.path}/salary_results.pdf');
+  //   final filePath = '${directory.path}/salary_results.pdf';
+  //   final file = File(filePath);
   //   await file.writeAsBytes(await pdf.save());
-  //   Get.snackbar('Success', 'PDF saved to ${file.path}');
+
+  //   // Use Share plugin to open the share sheet
+  //   Share.shareXFiles([XFile(filePath)],
+  //       text: 'Here is your salary PDF report.');
   // }
 
   // Save results as JPEG
-
   Future<void> saveResultsAsJPEG(GlobalKey repaintBoundaryKey) async {
     try {
       // Capture the image

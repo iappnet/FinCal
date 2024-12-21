@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/main_controller.dart';
+import '../controllers/salary_calculation_controller.dart';
 import '../models/allowance_model.dart';
 import '../utils/decimal_formatter.dart';
+import '../utils/shared_appbar.dart';
 
-class MainScreen extends StatelessWidget {
-  final MainController controller = Get.put(MainController());
+class SalaryCalculationScreen extends StatelessWidget {
+  final SalaryCalculationController controller =
+      Get.put(SalaryCalculationController());
   final GlobalKey _resultsKey = GlobalKey(); // For capturing results as JPEG
   final TextEditingController transportationController =
       TextEditingController();
@@ -14,12 +16,19 @@ class MainScreen extends StatelessWidget {
   final TextEditingController raisePercentageController =
       TextEditingController();
 
-  MainScreen({super.key});
+  SalaryCalculationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Salary Calculator')),
+      appBar: SharedAppBar(
+        title: 'Salary Calculator',
+        gradient: LinearGradient(
+          colors: [Colors.blueAccent, Colors.purpleAccent],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
       body: GestureDetector(
         onTap: () =>
             FocusScope.of(context).unfocus(), // Dismiss keyboard on tap
@@ -33,7 +42,15 @@ class MainScreen extends StatelessWidget {
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
                 textInputAction: TextInputAction
                     .done, // Adds a 'Done' button to the keyboard
-                decoration: InputDecoration(labelText: 'Base Salary'),
+                decoration: InputDecoration(
+                  labelText: 'Base Salary',
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.done),
+                    onPressed: () {
+                      FocusScope.of(context).unfocus(); // Dismiss the keyboard
+                    },
+                  ),
+                ),
                 onChanged: (value) {
                   controller.updateBaseSalary(double.tryParse(value) ?? 0.0);
                 },
@@ -72,8 +89,16 @@ class MainScreen extends StatelessWidget {
                         inputFormatters: [
                           DecimalInputFormatter(decimalPlaces: 2)
                         ],
-                        decoration:
-                            InputDecoration(labelText: 'Raise Percentage (%)'),
+                        decoration: InputDecoration(
+                          labelText: 'Raise Percentage (%)',
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.done),
+                            onPressed: () {
+                              FocusScope.of(context)
+                                  .unfocus(); // Dismiss the keyboard
+                            },
+                          ),
+                        ),
                         onChanged: (value) {
                           controller.updateRaisePercentage(
                               double.tryParse(value) ?? 0.0);
@@ -123,8 +148,16 @@ class MainScreen extends StatelessWidget {
                           DecimalInputFormatter(
                               decimalPlaces: 2) // Ensures correct format
                         ],
-                        decoration:
-                            InputDecoration(labelText: 'Housing Allowance (%)'),
+                        decoration: InputDecoration(
+                          labelText: 'Housing Allowance (%)',
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.done),
+                            onPressed: () {
+                              FocusScope.of(context)
+                                  .unfocus(); // Dismiss the keyboard
+                            },
+                          ),
+                        ),
                         onChanged: (value) {
                           String cleanValue = value
                               .replaceAll('%', '')
@@ -196,7 +229,15 @@ class MainScreen extends StatelessWidget {
                           DecimalInputFormatter(decimalPlaces: 2)
                         ],
                         decoration: InputDecoration(
-                            labelText: 'Transportation Allowance (%)'),
+                          labelText: 'Transportation Allowance (%)',
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.done),
+                            onPressed: () {
+                              FocusScope.of(context)
+                                  .unfocus(); // Dismiss the keyboard
+                            },
+                          ),
+                        ),
                         onChanged: (value) {
                           String cleanValue = value.replaceAll('%', '').trim();
 
@@ -264,8 +305,16 @@ class MainScreen extends StatelessWidget {
                         inputFormatters: [
                           DecimalInputFormatter(decimalPlaces: 2)
                         ],
-                        decoration:
-                            InputDecoration(labelText: 'Social Insurance (%)'),
+                        decoration: InputDecoration(
+                          labelText: 'Social Insurance (%)',
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.done),
+                            onPressed: () {
+                              FocusScope.of(context)
+                                  .unfocus(); // Dismiss the keyboard
+                            },
+                          ),
+                        ),
                         onChanged: (value) {
                           String cleanValue = value.replaceAll('%', '').trim();
 
@@ -349,8 +398,6 @@ class MainScreen extends StatelessWidget {
               SizedBox(height: 20),
 
               // Results Container
-
-              // Results Container
               Obx(() => RepaintBoundary(
                     key: _resultsKey,
                     child: Container(
@@ -358,7 +405,15 @@ class MainScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
                         color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withValues(),
+                            spreadRadius: 2,
+                            blurRadius: 5,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -447,12 +502,22 @@ class MainScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
-                    onPressed: () => controller.saveResultsAsPDF(),
-                    child: Text('Save as PDF'),
+                    onPressed: () => controller.shareResults(_resultsKey),
+                    child: Text('Share Calculation'),
                   ),
+                  // ElevatedButton(
+                  //   onPressed: () => controller.saveResultsAsPDF(),
+                  //   child: Text('Save as PDF'),
+                  // ),
+                  // ElevatedButton(
+                  //   onPressed: () => controller.saveResultsAsJPEG(_resultsKey),
+                  //   child: Text('Save as JPEG'),
+                  // ),
                   ElevatedButton(
-                    onPressed: () => controller.saveResultsAsJPEG(_resultsKey),
-                    child: Text('Save as JPEG'),
+                    onPressed: () {
+                      controller.saveCalculation('Salary Calculation');
+                    },
+                    child: Text('Save Calculation'),
                   ),
                 ],
               ),
