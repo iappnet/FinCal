@@ -17,7 +17,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'app/controllers/bottom_navigation_controller.dart';
-import 'app/controllers/home_controller.dart';
 import 'app/controllers/settings_controller.dart';
 import 'app/routes/app_pages.dart';
 import 'app/services/localization_service.dart';
@@ -39,10 +38,15 @@ void main() async {
 class MyApp extends StatelessWidget {
   final SettingsController settingsController = Get.put(SettingsController());
 
+  MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Obx(
       () => GetMaterialApp(
+        initialBinding: BindingsBuilder(() {
+          Get.put<BottomNavigationController>(BottomNavigationController());
+        }),
         title: "Financial Tools".tr, // Use translated title
         translations: LocalizationService(),
         locale: LocalizationService.locale,
@@ -85,7 +89,7 @@ class MyApp extends StatelessWidget {
 class MainApp extends StatelessWidget {
   final BottomNavigationController controller =
       Get.put(BottomNavigationController());
-  final HomeController homeController = Get.put(HomeController());
+  // final HomeController homeController = Get.put(HomeController());
 
   MainApp({super.key});
 
@@ -113,7 +117,7 @@ class MainApp extends StatelessWidget {
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Home',
+            label: 'home'.tr,
           ),
           // BottomNavigationBarItem(
           //   icon: Icon(Icons.calculate),
@@ -121,11 +125,11 @@ class MainApp extends StatelessWidget {
           // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history),
-            label: 'Calculation History',
+            label: 'calculation_history'.tr,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings_applications_outlined),
-            label: 'settings',
+            label: 'settings'.tr,
           ),
         ],
       ),

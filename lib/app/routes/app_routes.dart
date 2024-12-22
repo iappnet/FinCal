@@ -2,6 +2,7 @@ part of 'app_pages.dart';
 
 abstract class Routes {
   Routes._();
+  static const mainapp = _Paths.mainapp;
   static const home = _Paths.home;
   static const salaryCalculation = _Paths.salaryCalculation;
   static const history = _Paths.history;
@@ -13,6 +14,7 @@ abstract class Routes {
 
 abstract class _Paths {
   _Paths._();
+  static const mainapp = '/';
   static const home = '/home';
   static const salaryCalculation = '/salary-calculation';
   static const history = '/history';

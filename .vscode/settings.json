@@ -2,14 +2,20 @@
     "cSpell.words": [
         "appbar",
         "AUTOINCREMENT",
+        "COCOAPODS",
         "cupertino",
         "fincal",
         "Getx",
+        "IPHONEOS",
+        "mainapp",
+        "podfile",
+        "podhelper",
         "salarycalculation",
         "salarycalculationscreen",
         "Schyler",
         "socialinsurance",
         "sqflite",
-        "updatesocialinsurance"
+        "updatesocialinsurance",
+        "xcconfig"
     ]
 }

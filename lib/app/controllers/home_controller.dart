@@ -4,51 +4,51 @@ import '../models/summary_model.dart'; // Define a model for the summary card
 class HomeController extends GetxController {
   // final someObservable = 0.obs; // Example initialization
 
-  // Reactive variables to track summaries
+// Reactive variables to track summaries
   var currentSummary = SummaryModel(
-    calculationType: 'Salary',
-    details: 'Your most recent salary calculation is SAR 20,000.',
+    calculationType: 'salary'.tr,
+    details: 'recent_salary_calc'.trParams({'amount': 'SAR 20,000'}),
   ).obs;
 
   var salarySummary = SummaryModel(
-    calculationType: 'Salary',
-    details: 'No recent salary calculation.',
+    calculationType: 'salary'.tr,
+    details: 'no_salary_calc'.tr,
   ).obs;
 
   var investmentSummary = SummaryModel(
-    calculationType: 'Investment',
-    details: 'No recent investment calculation.',
+    calculationType: 'investment'.tr,
+    details: 'no_investment_calc'.tr,
   ).obs;
 
   var loanSummary = SummaryModel(
-    calculationType: 'Loan',
-    details: 'No recent loan calculation.',
+    calculationType: 'loan'.tr,
+    details: 'no_loan_calc'.tr,
   ).obs;
 
-  // Method to update summaries dynamically
+// Method to update summaries dynamically
   void updateSummary(String type, String details) {
     switch (type) {
       case 'Salary':
         salarySummary.value = SummaryModel(
-          calculationType: 'Salary',
+          calculationType: 'salary'.tr,
           details: details,
         );
         break;
       case 'Investment':
         investmentSummary.value = SummaryModel(
-          calculationType: 'Investment',
+          calculationType: 'investment'.tr,
           details: details,
         );
         break;
       case 'Loan':
         loanSummary.value = SummaryModel(
-          calculationType: 'Loan',
+          calculationType: 'loan'.tr,
           details: details,
         );
         break;
     }
     currentSummary.value = SummaryModel(
-      calculationType: type,
+      calculationType: type.tr,
       details: details,
     );
   }

@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 import '../controllers/bottom_navigation_controller.dart';
 
 class SharedBottomNavBar extends StatelessWidget {
-  final BottomNavigationController controller = Get.find();
+  final BottomNavigationController controller =
+      Get.find<BottomNavigationController>();
 
   final List<BottomNavigationBarItem> items;
 

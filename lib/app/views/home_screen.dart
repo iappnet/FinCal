@@ -99,7 +99,7 @@ class HomeScreen extends StatelessWidget {
             ),
 
             // Dynamic Summary Card
-            _buildSummaryCard(),
+            // _buildSummaryCard(),
           ],
         ),
       ),
@@ -144,35 +144,35 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryCard() {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'most_recent_summary'.tr,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            Obx(() {
-              // Retrieve dynamic content from the controller
-              final summary = controller.currentSummary.value;
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('${'calculation_type'.tr}: ${summary.calculationType}'),
-                ],
-              );
-            }),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget _buildSummaryCard() {
+  //   return Card(
+  //     elevation: 4,
+  //     shape: RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.circular(12),
+  //     ),
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(16.0),
+  //       child: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Text(
+  //             'most_recent_summary'.tr,
+  //             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  //           ),
+  //           SizedBox(height: 8),
+  //           Obx(() {
+  //             // Retrieve dynamic content from the controller
+  //             final summary = controller.currentSummary.value;
+  //             return Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Text('${'calculation_type'.tr}: ${summary.calculationType}'),
+  //               ],
+  //             );
+  //           }),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 }

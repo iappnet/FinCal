@@ -183,7 +183,7 @@ class SalaryCalculationController extends GetxController {
                   // Allowance Name
                   TextField(
                     controller: nameController,
-                    decoration: InputDecoration(labelText: 'Allowance Name'),
+                    decoration: InputDecoration(labelText: 'allowance_name'.tr),
                   ),
                   SizedBox(height: 10),
 
@@ -193,13 +193,13 @@ class SalaryCalculationController extends GetxController {
                     items: AllowanceType.values.map((type) {
                       return DropdownMenuItem(
                         value: type,
-                        child: Text(type.toString().split('.').last),
+                        child: Text(type.toString().split('.').last.tr),
                       );
                     }).toList(),
                     onChanged: (value) {
                       if (value != null) selectedType.value = value;
                     },
-                    decoration: InputDecoration(labelText: 'Allowance Type'),
+                    decoration: InputDecoration(labelText: 'allowance_type'.tr),
                   ),
                   SizedBox(height: 10),
 
@@ -209,15 +209,16 @@ class SalaryCalculationController extends GetxController {
                       controller: valueController,
                       keyboardType:
                           TextInputType.numberWithOptions(decimal: true),
-                      decoration: InputDecoration(labelText: 'Allowance Value'),
+                      decoration:
+                          InputDecoration(labelText: 'allowance_value'.tr),
                     ),
                   if (selectedType.value == AllowanceType.percentage) ...[
                     TextField(
                       controller: valueController,
                       keyboardType:
                           TextInputType.numberWithOptions(decimal: true),
-                      decoration: InputDecoration(
-                          labelText: 'Allowance Percentage (%)'),
+                      decoration:
+                          InputDecoration(labelText: 'allowance_percentage'.tr),
                       onChanged: (value) {
                         update();
                       },
@@ -227,7 +228,7 @@ class SalaryCalculationController extends GetxController {
                           (double.tryParse(valueController.text) ?? 0.0) /
                           100;
                       return Text(
-                        "Calculated Value: SAR ${percentageValue.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
+                        '${'calculated_value'.tr}: SAR ${percentageValue.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       );
                     }),
@@ -239,8 +240,8 @@ class SalaryCalculationController extends GetxController {
                       controller: valueController,
                       keyboardType:
                           TextInputType.numberWithOptions(decimal: true),
-                      decoration: InputDecoration(
-                          labelText: 'Allowance Percentage (%)'),
+                      decoration:
+                          InputDecoration(labelText: 'allowance_percentage'.tr),
                       onChanged: (value) {
                         update();
                       },
@@ -250,7 +251,8 @@ class SalaryCalculationController extends GetxController {
                       controller: minController,
                       keyboardType:
                           TextInputType.numberWithOptions(decimal: true),
-                      decoration: InputDecoration(labelText: 'Minimum Value'),
+                      decoration:
+                          InputDecoration(labelText: 'minimum_value'.tr),
                       onChanged: (value) {
                         update();
                       },
@@ -260,7 +262,8 @@ class SalaryCalculationController extends GetxController {
                       controller: maxController,
                       keyboardType:
                           TextInputType.numberWithOptions(decimal: true),
-                      decoration: InputDecoration(labelText: 'Maximum Value'),
+                      decoration:
+                          InputDecoration(labelText: 'maximum_value'.tr),
                       onChanged: (value) {
                         update();
                       },
@@ -275,7 +278,7 @@ class SalaryCalculationController extends GetxController {
                       percentageValue = percentageValue.clamp(min, max);
 
                       return Text(
-                        "Calculated Value: SAR ${percentageValue.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
+                        '${'calculated_value'.tr}: SAR ${percentageValue.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       );
                     }),
@@ -331,7 +334,7 @@ class SalaryCalculationController extends GetxController {
                       Navigator.pop(context);
                       update();
                     },
-                    child: Text('Save Changes'),
+                    child: Text('save_changes'.tr),
                   ),
                 ],
               ),
@@ -342,19 +345,19 @@ class SalaryCalculationController extends GetxController {
 
   Future<void> saveCalculation(String calculationType) async {
     final details = {
-      'Base Salary': baseSalary.value,
-      'Housing Allowance': housingAllowanceAmount,
-      'Transportation Allowance': transportationAllowanceAmount,
-      'Custom Allowances': allowances
+      'base_salary'.tr: baseSalary.value,
+      'housing_allowance'.tr: housingAllowanceAmount,
+      'transportation_allowance'.tr: transportationAllowanceAmount,
+      'custom_allowances'.tr: allowances
           .map((a) => {
-                'Name': a.name,
-                'Value': a.value,
-                'Type': a.type.toString(),
+                'name'.tr: a.name,
+                'value'.tr: a.value,
+                'type'.tr: a.type.toString(),
               })
           .toList(),
-      'Social Insurance Deduction': socialSecurityAmount,
-      'Pre-Deduction Total': preDeductionTotal,
-      'Post-Deduction Total': postDeductionTotal,
+      'social_insurance_deduction'.tr: socialSecurityAmount,
+      'pre_deduction_total'.tr: preDeductionTotal,
+      'post_deduction_total'.tr: postDeductionTotal,
     };
 
     final calculation = CalculationModel(
@@ -364,89 +367,59 @@ class SalaryCalculationController extends GetxController {
     );
 
     await DatabaseHelper().insertCalculation(calculation);
-    Get.snackbar('Success', '$calculationType saved successfully!');
-  }
-
-  Future<void> fetchSavedCalculations() async {
-    final calculations = await DatabaseHelper().fetchCalculations();
-    for (var calc in calculations) {
-      if (kDebugMode) {
-        print(
-            'ID: ${calc.id}, Type: ${calc.calculationType}, Details: ${calc.details}');
-      }
-    }
+    Get.snackbar(
+        'success'.tr, '${'calculation_saved_success'.tr} $calculationType!');
   }
 
   Future<void> shareResults(GlobalKey repaintBoundaryKey) async {
     try {
-      // Access the SettingsController to read the auto-save preference
       final settingsController = Get.find<SettingsController>();
       final autoSaveEnabled = settingsController.isAutoSaveImage.value;
-      // Check user preference for auto-save
 
-      // Generate PDF
       final pdfPath = await saveResultsAsPDF();
 
-      // Generate JPEG
       String? jpgPath;
-      if (autoSaveEnabled == 'true') {
+      if (autoSaveEnabled) {
         jpgPath = await saveResultsAsJPEG(repaintBoundaryKey, autoSave: true);
       } else {
         jpgPath = await saveResultsAsJPEG(repaintBoundaryKey, autoSave: false);
       }
 
-      // Generate Text
       final textDetails = '''
-Salary Calculation Report
+${'salary_calculation_report'.tr}
 ----------------------------
-Base Salary: SAR ${baseSalary.value.toStringAsFixed(2)}
-Housing Allowance: SAR ${housingAllowanceAmount.toStringAsFixed(2)}
-Transportation Allowance: SAR ${transportationAllowanceAmount.toStringAsFixed(2)}
-Social Security Deduction: SAR ${socialSecurityAmount.toStringAsFixed(2)}
-Pre-Deduction Total: SAR ${preDeductionTotal.toStringAsFixed(2)}
-Post-Deduction Total: SAR ${postDeductionTotal.toStringAsFixed(2)}
+${'base_salary'.tr}: SAR ${baseSalary.value.toStringAsFixed(2)}
+${'housing_allowance'.tr}: SAR ${housingAllowanceAmount.toStringAsFixed(2)}
+${'transportation_allowance'.tr}: SAR ${transportationAllowanceAmount.toStringAsFixed(2)}
+${'social_insurance_deduction'.tr}: SAR ${socialSecurityAmount.toStringAsFixed(2)}
+${'pre_deduction_total'.tr}: SAR ${preDeductionTotal.toStringAsFixed(2)}
+${'post_deduction_total'.tr}: SAR ${postDeductionTotal.toStringAsFixed(2)}
 
-Generated on: ${DateTime.now().toLocal()}
+${'generated_on'.tr}: ${DateTime.now().toLocal()}
 ''';
 
-      // // Prepare files for sharing
-      // final files = <XFile>[
-      //   XFile(pdfPath, name: 'Calculation_Report.pdf'),
-      //   if (jpgPath != null) XFile(jpgPath, name: 'Calculation_Report.jpg'),
-      // ];
-
-      // // Show Share Sheet
-      // Share.shareXFiles(
-      //   files,
-      //   text: textDetails,
-      // );
-
-      // Show dialog for user to choose action
       await Get.defaultDialog(
-        title: "Share Calculation",
+        title: "share_calculation".tr,
         content: Column(
           children: [
             ElevatedButton(
               onPressed: () {
-                // Share as text
-                Share.share(textDetails, subject: "Salary Calculation Report");
-                Get.back(); // Close dialog
+                Share.share(textDetails,
+                    subject: "salary_calculation_report".tr);
+                Get.back();
               },
-              child: Text("Share as Text"),
+              child: Text("share_as_text".tr),
             ),
             ElevatedButton(
               onPressed: () {
-                // Copy text to clipboard
                 Clipboard.setData(ClipboardData(text: textDetails));
-                Get.snackbar(
-                    "Copied", "Calculation details copied to clipboard");
-                Get.back(); // Close dialog
+                Get.snackbar("copied".tr, "calculation_copied_clipboard".tr);
+                Get.back();
               },
-              child: Text("Copy to Clipboard"),
+              child: Text("copy_to_clipboard".tr),
             ),
             ElevatedButton(
               onPressed: () {
-                // Share files (PDF and/or JPEG)
                 final files = <XFile>[
                   XFile(pdfPath, name: 'Calculation_Report.pdf'),
                   if (jpgPath != null)
@@ -456,15 +429,15 @@ Generated on: ${DateTime.now().toLocal()}
                   files,
                   text: textDetails,
                 );
-                Get.back(); // Close dialog
+                Get.back();
               },
-              child: Text("Share Files"),
+              child: Text("share_files".tr),
             ),
           ],
         ),
       );
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred while sharing: $e');
+      Get.snackbar('error'.tr, '${'error_occurred_sharing'.tr}: $e');
     }
   }
 
@@ -477,7 +450,7 @@ Generated on: ${DateTime.now().toLocal()}
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text(
-              'Salary Calculation Report',
+              'salary_calculation_report'.tr,
               style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
             ),
             pw.SizedBox(height: 20),
@@ -489,40 +462,40 @@ Generated on: ${DateTime.now().toLocal()}
               },
               children: [
                 pw.TableRow(children: [
-                  pw.Text('Description',
+                  pw.Text('description'.tr,
                       style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                  pw.Text('Amount (SAR)',
+                  pw.Text('amount_sar'.tr,
                       style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
                 ]),
                 pw.TableRow(children: [
-                  pw.Text('Base Salary'),
+                  pw.Text('base_salary'.tr),
                   pw.Text(baseSalary.value.toStringAsFixed(2)),
                 ]),
                 pw.TableRow(children: [
-                  pw.Text('Housing Allowance'),
+                  pw.Text('housing_allowance'.tr),
                   pw.Text(housingAllowanceAmount.toStringAsFixed(2)),
                 ]),
                 pw.TableRow(children: [
-                  pw.Text('Transportation Allowance'),
+                  pw.Text('transportation_allowance'.tr),
                   pw.Text(transportationAllowanceAmount.toStringAsFixed(2)),
                 ]),
                 pw.TableRow(children: [
-                  pw.Text('Social Security Deduction'),
+                  pw.Text('social_insurance_deduction'.tr),
                   pw.Text(socialSecurityAmount.toStringAsFixed(2)),
                 ]),
                 pw.TableRow(children: [
-                  pw.Text('Pre-Deduction Total'),
+                  pw.Text('pre_deduction_total'.tr),
                   pw.Text(preDeductionTotal.toStringAsFixed(2)),
                 ]),
                 pw.TableRow(children: [
-                  pw.Text('Post-Deduction Total'),
+                  pw.Text('post_deduction_total'.tr),
                   pw.Text(postDeductionTotal.toStringAsFixed(2)),
                 ]),
               ],
             ),
             pw.SizedBox(height: 20),
             pw.Text(
-              'Generated on: ${DateTime.now().toLocal()}',
+              '${'generated_on'.tr}: ${DateTime.now().toLocal()}',
               style: pw.TextStyle(
                   fontSize: 12, color: PdfColor.fromHex('#888888')),
             ),
@@ -556,10 +529,16 @@ Generated on: ${DateTime.now().toLocal()}
         bool success = result['isSuccess'] ?? false;
 
         if (success) {
-          Get.snackbar('Success', 'Image saved to Photos successfully.');
+          Get.snackbar(
+            'success'.tr,
+            'image_saved_photos'.tr,
+          );
           return result['filePath'] ?? result['file'];
         } else {
-          Get.snackbar('Error', 'Failed to save the image.');
+          Get.snackbar(
+            'error'.tr,
+            'failed_save_image'.tr,
+          );
           return null;
         }
       } else {
@@ -572,7 +551,10 @@ Generated on: ${DateTime.now().toLocal()}
         return filePath;
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred while saving JPEG: $e');
+      Get.snackbar(
+        'error'.tr,
+        '${'error_saving_image'.tr}: $e',
+      );
       return null;
     }
   }
