@@ -40,7 +40,7 @@
   "investment_calculation": "حساب الاستثمار",
   "loan_calculation": "حساب القرض",
   "share_calculation": "مشاركة العملية",
-    "welcome": "مرحبًا!",
+  "welcome": "مرحبًا!",
   "welcome_back": "مرحبًا بعودتك، @username!",
   "today_is": "اليوم هو",
   "calculate_salary_description": "احسب تفاصيل راتبك.",
@@ -84,5 +84,4 @@
   "no_salary_calc": "لا يوجد حساب راتب حديث.",
   "no_investment_calc": "لا يوجد حساب استثمار حديث.",
   "no_loan_calc": "لا يوجد حساب قرض حديث."
-
 }
