@@ -83,5 +83,8 @@
   "recent_salary_calc": "آخر حساب راتب خاص بك هو {{amount}}.",
   "no_salary_calc": "لا يوجد حساب راتب حديث.",
   "no_investment_calc": "لا يوجد حساب استثمار حديث.",
-  "no_loan_calc": "لا يوجد حساب قرض حديث."
+  "no_loan_calc": "لا يوجد حساب قرض حديث.",
+  "allowance_type_fixed": "مبلغ ثابت",
+  "allowance_type_percentage": "نسبة مئوية",
+  "allowance_type_percentage_with_min_max": "نسبة مئوية بحد أدنى/أعلى"
 }

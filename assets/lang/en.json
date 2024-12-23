@@ -81,6 +81,8 @@
   "recent_salary_calc": "Your most recent salary calculation is {{amount}}.",
   "no_salary_calc": "No recent salary calculation.",
   "no_investment_calc": "No recent investment calculation.",
-  "no_loan_calc": "No recent loan calculation."
-
+  "no_loan_calc": "No recent loan calculation.",
+  "allowance_type_fixed": "Fixed amount",
+  "allowance_type_percentage": "Percentage",
+  "allowance_type_percentage_with_min_max": "Percentage with Min/Max"
 }

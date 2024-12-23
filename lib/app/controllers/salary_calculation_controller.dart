@@ -192,7 +192,7 @@ class SalaryCalculationController extends GetxController {
                     items: AllowanceType.values.map((type) {
                       return DropdownMenuItem(
                         value: type,
-                        child: Text(type.toString().split('.').last.tr),
+                        child: Text(getAllowanceTypeString(type)),
                       );
                     }).toList(),
                     onChanged: (value) {
@@ -200,6 +200,7 @@ class SalaryCalculationController extends GetxController {
                     },
                     decoration: InputDecoration(labelText: 'allowance_type'.tr),
                   ),
+
                   SizedBox(height: 10),
 
                   // Conditionally Render Allowance Fields
@@ -227,7 +228,7 @@ class SalaryCalculationController extends GetxController {
                           (double.tryParse(valueController.text) ?? 0.0) /
                           100;
                       return Text(
-                        '${'calculated_value'.tr}: SAR ${percentageValue.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
+                        '${'calculated_value'.tr}: ${'SAR'.tr} ${percentageValue.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       );
                     }),
@@ -277,7 +278,7 @@ class SalaryCalculationController extends GetxController {
                       percentageValue = percentageValue.clamp(min, max);
 
                       return Text(
-                        '${'calculated_value'.tr}: SAR ${percentageValue.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
+                        '${'calculated_value'.tr}: ${'SAR'.tr} ${percentageValue.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       );
                     }),
@@ -387,12 +388,12 @@ class SalaryCalculationController extends GetxController {
       final textDetails = '''
 ${'salary_calculation_report'.tr}
 ----------------------------
-${'base_salary'.tr}: SAR ${baseSalary.value.toStringAsFixed(2)}
-${'housing_allowance'.tr}: SAR ${housingAllowanceAmount.toStringAsFixed(2)}
-${'transportation_allowance'.tr}: SAR ${transportationAllowanceAmount.toStringAsFixed(2)}
-${'social_insurance_deduction'.tr}: SAR ${socialSecurityAmount.toStringAsFixed(2)}
-${'pre_deduction_total'.tr}: SAR ${preDeductionTotal.toStringAsFixed(2)}
-${'post_deduction_total'.tr}: SAR ${postDeductionTotal.toStringAsFixed(2)}
+${'base_salary'.tr}: ${'SAR'.tr} ${baseSalary.value.toStringAsFixed(2)}
+${'housing_allowance'.tr}: ${'SAR'.tr} ${housingAllowanceAmount.toStringAsFixed(2)}
+${'transportation_allowance'.tr}: ${'SAR'.tr} ${transportationAllowanceAmount.toStringAsFixed(2)}
+${'social_insurance_deduction'.tr}: ${'SAR'.tr} ${socialSecurityAmount.toStringAsFixed(2)}
+${'pre_deduction_total'.tr}: ${'SAR'.tr} ${preDeductionTotal.toStringAsFixed(2)}
+${'post_deduction_total'.tr}: ${'SAR'.tr} ${postDeductionTotal.toStringAsFixed(2)}
 
 ${'generated_on'.tr}: ${DateTime.now().toLocal()}
 ''';
