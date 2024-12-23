@@ -4,7 +4,6 @@ import '../controllers/salary_calculation_controller.dart';
 import '../models/allowance_model.dart';
 import '../utils/decimal_formatter.dart';
 import '../utils/shared_appbar.dart';
-import '../utils/shared_bottom_navbar.dart';
 
 class SalaryCalculationScreen extends StatelessWidget {
   final SalaryCalculationController controller =
@@ -497,26 +496,6 @@ class SalaryCalculationScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () => controller.addAllowance(context),
         child: Icon(Icons.add),
-      ),
-      bottomNavigationBar: SharedBottomNavBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'home'.tr,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calculate),
-            label: 'salary_calculation'.tr,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'history'.tr,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'settings'.tr,
-          ),
-        ],
       ),
     );
   }

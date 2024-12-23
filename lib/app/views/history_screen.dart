@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/history_controller.dart';
+import '../utils/shared_appbar.dart';
 
 class HistoryScreen extends StatelessWidget {
   final HistoryController controller = Get.put(HistoryController());
@@ -10,8 +11,13 @@ class HistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('calculation_history'.tr), // Localized
+      appBar: SharedAppBar(
+        title: 'calculation_history'.tr,
+        gradient: LinearGradient(
+          colors: [Colors.blueAccent, Colors.purpleAccent],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
       ),
       body: Obx(() {
         if (controller.isLoading.value) {

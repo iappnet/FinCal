@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class SharedAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -20,7 +19,7 @@ class SharedAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text('app_title'.tr),
+      title: Text(title),
       flexibleSpace: Container(
         decoration: BoxDecoration(
           gradient: gradient,
