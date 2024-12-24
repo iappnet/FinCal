@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:pdf/pdf.dart';
 import '../models/allowance_model.dart';
 import 'dart:io';
@@ -9,11 +10,10 @@ import 'package:pdf/widgets.dart' as pw;
 import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
-
 import '../models/calculation_model.dart';
 import '../services/database_helper.dart';
 import '../controllers/settings_controller.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SalaryCalculationController extends GetxController {
   // Reactive variables
@@ -515,6 +515,18 @@ ${'generated_on'.tr}: ${DateTime.now().toLocal()}
   Future<String?> saveResultsAsJPEG(GlobalKey repaintBoundaryKey,
       {bool autoSave = false}) async {
     try {
+      // Request storage permissions
+      if (Platform.isAndroid) {
+        final status = await Permission.storage.request();
+        if (!status.isGranted) {
+          Get.snackbar(
+            'error'.tr,
+            'storage_permission_denied'.tr,
+          );
+          return null;
+        }
+      }
+
       // Capture the image
       final boundary = repaintBoundaryKey.currentContext?.findRenderObject()
           as RenderRepaintBoundary;
@@ -525,7 +537,7 @@ ${'generated_on'.tr}: ${DateTime.now().toLocal()}
       if (autoSave) {
         // Save the image to Photos
         final result =
-            await ImageGallerySaver.saveImage(pngBytes, quality: 100);
+            await ImageGallerySaverPlus.saveImage(pngBytes, quality: 100);
         bool success = result['isSuccess'] ?? false;
 
         if (success) {
