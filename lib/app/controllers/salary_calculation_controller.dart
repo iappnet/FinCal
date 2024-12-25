@@ -13,7 +13,6 @@ import 'package:share_plus/share_plus.dart';
 import '../models/calculation_model.dart';
 import '../services/database_helper.dart';
 import '../controllers/settings_controller.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class SalaryCalculationController extends GetxController {
   // Reactive variables
@@ -515,18 +514,6 @@ ${'generated_on'.tr}: ${DateTime.now().toLocal()}
   Future<String?> saveResultsAsJPEG(GlobalKey repaintBoundaryKey,
       {bool autoSave = false}) async {
     try {
-      // Request storage permissions
-      if (Platform.isAndroid) {
-        final status = await Permission.storage.request();
-        if (!status.isGranted) {
-          Get.snackbar(
-            'error'.tr,
-            'storage_permission_denied'.tr,
-          );
-          return null;
-        }
-      }
-
       // Capture the image
       final boundary = repaintBoundaryKey.currentContext?.findRenderObject()
           as RenderRepaintBoundary;

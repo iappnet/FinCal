@@ -1,22 +1,11 @@
 {
     "cSpell.words": [
-        "appbar",
-        "AUTOINCREMENT",
-        "COCOAPODS",
-        "cupertino",
+        "Cupertino",
+        "dontwarn",
+        "errorprone",
         "fincal",
-        "Getx",
-        "IPHONEOS",
-        "mainapp",
-        "podfile",
-        "podhelper",
-        "salarycalculation",
-        "salarycalculationscreen",
-        "Schyler",
-        "socialinsurance",
-        "sqflite",
-        "updatesocialinsurance",
-        "xcconfig",
-        "الرئيسية"
+        "javax",
+        "proguard",
+        "sqflite"
     ]
 }

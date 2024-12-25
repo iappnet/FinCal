@@ -1,4 +1,4 @@
-package com.iappnet.calculator_app
+package com.iappnet.fincals
 
 import io.flutter.embedding.android.FlutterActivity
 

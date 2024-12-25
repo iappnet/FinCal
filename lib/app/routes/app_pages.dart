@@ -1,4 +1,4 @@
-import 'package:fincal/main.dart';
+import 'package:fincals/main.dart';
 import 'package:get/get.dart';
 import '../bindings/salary_calculation_binding.dart'; // Create this if needed
 import '../views/calculation_details_screen.dart';

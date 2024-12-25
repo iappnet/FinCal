@@ -1,6 +1,6 @@
 {
-    "name": "calculator_app",
-    "short_name": "calculator_app",
+    "name": "fin_cals",
+    "short_name": "fin_cals",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

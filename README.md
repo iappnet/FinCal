@@ -1,4 +1,4 @@
-# calculator_app
+# fincals
 
 A new Flutter project.
 

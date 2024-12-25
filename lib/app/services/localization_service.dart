@@ -22,7 +22,7 @@ class LocalizationService extends Translations {
       localizedStrings['en_US'] = Map<String, String>.from(json.decode(enData));
       localizedStrings['ar_SA'] = Map<String, String>.from(json.decode(arData));
     } catch (e) {
-      print('Error loading localization files: $e');
+      // print('Error loading localization files: $e');
     }
   }
 
