@@ -67,9 +67,14 @@ class SalaryCalculationScreen extends StatelessWidget {
                       Spacer(),
                       Switch(
                         value: controller.hasRaise.value,
-                        onChanged: (value) {
-                          controller.toggleRaise(value);
-                        },
+                        // onChanged: (value) {
+                        //   controller.toggleRaise(value);
+                        // },
+                        onChanged: controller.isMultiYearProjection.value
+                            ? null // Disable the toggle when Multi-Year Projection is on
+                            : (value) {
+                                controller.toggleRaise(value);
+                              },
                       ),
                     ],
                   )),

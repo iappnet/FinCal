@@ -152,13 +152,26 @@ class SalaryCalculationController extends GetxController {
   }
 
   void updateDynamicFields() {
-    if (numberOfYears.value == 0) return;
+    if (numberOfYears.value == 0 || promotionInterval.value == 0) return;
 
     List<SalaryProjectionResult> dynamicInputs = [];
+
+    // Ensure firstPromotionYear is valid
+    int validFirstPromotionYear =
+        firstPromotionYear.value > 0 ? firstPromotionYear.value : -1;
+
     for (int i = 1; i <= numberOfYears.value; i++) {
-      bool hasPromotion = (i == firstPromotionYear.value ||
-          (i > firstPromotionYear.value &&
-              (i - firstPromotionYear.value) % promotionInterval.value == 0));
+      bool hasPromotion = false;
+
+      // Check promotion condition only if firstPromotionYear is valid
+      if (validFirstPromotionYear > 0 &&
+          (i == validFirstPromotionYear ||
+              (i > validFirstPromotionYear &&
+                  promotionInterval.value != 0 &&
+                  (i - validFirstPromotionYear) % promotionInterval.value ==
+                      0))) {
+        hasPromotion = true;
+      }
 
       dynamicInputs.add(SalaryProjectionResult(
         year: i,
@@ -214,6 +227,14 @@ class SalaryCalculationController extends GetxController {
   //     annualIncrement.value = 0.0;
   //     promotionIncrement.value = 0.0;
   //     multiYearResults.clear();
+  //   }
+  // }
+
+  // void toggleMultiYearProjection(bool value) {
+  //   isMultiYearProjection.value = value;
+  //   if (value) {
+  //     hasRaise.value = false; // Turn off Raise
+  //     clearRaiseFields(); // Clear Raise fields for consistency
   //   }
   // }
 
