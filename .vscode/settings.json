@@ -4,8 +4,14 @@
         "dontwarn",
         "errorprone",
         "fincal",
+        "fincals",
+        "Getx",
+        "iappsnet",
         "javax",
         "proguard",
-        "sqflite"
+        "Schyler",
+        "socialinsurance",
+        "sqflite",
+        "updatesocialinsurance"
     ]
 }

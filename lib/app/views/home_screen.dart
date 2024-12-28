@@ -113,33 +113,54 @@ class HomeScreen extends StatelessWidget {
       required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(icon, size: 40, color: Theme.of(context).primaryColor),
-              SizedBox(height: 16),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              // padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(
+                  constraints.maxWidth * 0.08), // Dynamic padding
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(icon,
+                      // size: 40,
+                      size: constraints.maxWidth * 0.2, // Dynamic icon size
+                      color: Theme.of(context).primaryColor),
+                  // SizedBox(height: 16),
+                  SizedBox(
+                      height: constraints.maxHeight * 0.05), // Dynamic spacing
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        // fontSize: 16,
+                        fontSize:
+                            constraints.maxWidth * 0.08, // Dynamic font size
+                        fontWeight: FontWeight.bold),
+                  ),
+                  // SizedBox(height: 8),
+                  SizedBox(
+                      height: constraints.maxHeight * 0.05), // Dynamic spacing
+                  Text(
+                    description,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        // fontSize: 14,
+                        fontSize:
+                            constraints.maxWidth * 0.07, // Dynamic font size
+                        color: Colors.grey[600]),
+                  ),
+                ],
               ),
-              SizedBox(height: 8),
-              Text(
-                description,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
