@@ -153,7 +153,6 @@ class SalaryCalculationScreen extends StatelessWidget {
                     ],
                   )),
               const SizedBox(height: 10),
-
               // Multi-Year Projection Inputs (Visible if Toggle is On)
               Obx(() {
                 if (controller.isMultiYearProjection.value) {
@@ -181,131 +180,157 @@ class SalaryCalculationScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
 
-                      // First Promotion Year
-                      TextField(
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: 'First promotion year'.tr,
+                      // Will you receive any promotions?
+                      Row(
+                        children: [
+                          Text("Will you receive any promotion?".tr),
+                          Spacer(),
+                          Switch(
+                            value: controller.willReceivePromotion.value,
+                            onChanged: (value) {
+                              controller.togglePromotion(value);
+                            },
+                          ),
+                        ],
+                      ),
+                      if (controller.willReceivePromotion.value)
+                        Column(
+                          children: [
+                            // Number of Promotions
+                            TextField(
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                labelText:
+                                    'How many promotions will you receive?'.tr,
+                              ),
+                              onChanged: (value) {
+                                controller.updateNumberOfPromotions(
+                                    int.tryParse(value) ?? 0);
+                              },
+                            ),
+                            const SizedBox(height: 10),
+
+                            // First Promotion Year
+                            TextField(
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                labelText: 'Enter the first promotion year'.tr,
+                              ),
+                              onChanged: (value) {
+                                controller.updateFirstPromotionYear(
+                                    int.tryParse(value) ?? 0);
+                              },
+                            ),
+                            const SizedBox(height: 10),
+
+                            // Promotion Interval
+                            TextField(
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                labelText: 'Promotion interval (in years)'.tr,
+                              ),
+                              onChanged: (value) {
+                                controller.updatePromotionInterval(
+                                    int.tryParse(value) ?? 0);
+                              },
+                            ),
+                            const SizedBox(height: 10),
+                          ],
                         ),
+
+                      // Result Scope Dropdown
+                      DropdownButton<String>(
+                        value: controller.resultScope.value,
                         onChanged: (value) {
-                          controller.updateFirstPromotionYear(
-                              int.tryParse(value) ?? 0);
+                          if (value != null) {
+                            controller.updateResultScope(value);
+                          }
                         },
+                        items: [
+                          DropdownMenuItem(
+                              value: 'lastYear',
+                              child: Text('Last Year Only'.tr)),
+                          DropdownMenuItem(
+                              value: 'allYears', child: Text('All Years'.tr)),
+                        ],
+                        hint: Text('Select result scope'.tr),
                       ),
                       const SizedBox(height: 10),
-
-                      // Promotion Interval
-                      TextField(
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: 'Promotion interval (in years)'.tr,
-                        ),
-                        onChanged: (value) {
-                          controller.updatePromotionInterval(
-                              int.tryParse(value) ?? 0);
-                          controller.updateDynamicFields();
-                        },
-                      ),
-                      const SizedBox(height: 10),
-
                       // Dynamically Generated Increment and Promotion Inputs
                       Obx(() {
-                        return Column(
-                          children: List.generate(
-                            controller.dynamicInputs.length,
-                            (index) => Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                TextField(
-                                  keyboardType: TextInputType.numberWithOptions(
-                                      decimal: true),
-                                  decoration: InputDecoration(
-                                    labelText:
-                                        'Year ${controller.dynamicInputs[index].year} - Annual increment (%)'
-                                            .tr,
-                                  ),
-                                  onChanged: (value) {
-                                    controller.updateAnnualIncrementForYear(
-                                      index,
-                                      double.tryParse(value) ?? 0.0,
-                                    );
-                                  },
-                                ),
-                                const SizedBox(height: 10),
-                                if (controller
-                                    .dynamicInputs[index].hasPromotion)
-                                  TextField(
-                                    keyboardType:
-                                        TextInputType.numberWithOptions(
-                                            decimal: true),
-                                    decoration: InputDecoration(
-                                      labelText:
-                                          'Year ${controller.dynamicInputs[index].year} - Promotion increment (%)'
-                                              .tr,
-                                    ),
-                                    onChanged: (value) {
-                                      controller
-                                          .updatePromotionIncrementForYear(
-                                        index,
-                                        double.tryParse(value) ?? 0.0,
-                                      );
-                                    },
-                                  ),
-                                const SizedBox(height: 10),
-                              ],
-                            ),
-                          ),
-                        );
-                      })
+                        // Ensure Multi-Year Projection is enabled and Number of Years is valid
+                        if (controller.isMultiYearProjection.value &&
+                            controller.numberOfYears.value > 0) {
+                          return Column(
+                            children: List.generate(
+                              controller.dynamicInputs.length,
+                              (index) {
+                                final dynamicInput =
+                                    controller.dynamicInputs[index];
 
-                      // Obx(() {
-                      //   return Column(
-                      //     children: List.generate(
-                      //       controller.dynamicInputs.length,
-                      //       (index) => Column(
-                      //         crossAxisAlignment: CrossAxisAlignment.start,
-                      //         children: [
-                      //           TextField(
-                      //             keyboardType: TextInputType.numberWithOptions(
-                      //                 decimal: true),
-                      //             decoration: InputDecoration(
-                      //               labelText:
-                      //                   'Year ${controller.dynamicInputs[index].year} - Annual increment (%)'
-                      //                       .tr,
-                      //             ),
-                      //             onChanged: (value) {
-                      //               controller.updateAnnualIncrementForYear(
-                      //                 index,
-                      //                 double.tryParse(value) ?? 0.0,
-                      //               );
-                      //             },
-                      //           ),
-                      //           const SizedBox(height: 10),
-                      //           if (controller
-                      //               .dynamicInputs[index].hasPromotion)
-                      //             TextField(
-                      //               keyboardType:
-                      //                   TextInputType.numberWithOptions(
-                      //                       decimal: true),
-                      //               decoration: InputDecoration(
-                      //                 labelText:
-                      //                     'Year ${controller.dynamicInputs[index].year} - Promotion increment (%)'
-                      //                         .tr,
-                      //               ),
-                      //               onChanged: (value) {
-                      //                 controller
-                      //                     .updatePromotionIncrementForYear(
-                      //                   index,
-                      //                   double.tryParse(value) ?? 0.0,
-                      //                 );
-                      //               },
-                      //             ),
-                      //           const SizedBox(height: 10),
-                      //         ],
-                      //       ),
-                      //     ),
-                      //   );
-                      // }),
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Annual Increment Field (always displayed for each year)
+                                    TextField(
+                                      keyboardType:
+                                          TextInputType.numberWithOptions(
+                                              decimal: true),
+                                      decoration: InputDecoration(
+                                        labelText:
+                                            'Year ${dynamicInput.year} - Annual increment (%)'
+                                                .tr,
+                                      ),
+                                      onChanged: (value) {
+                                        controller.updateAnnualIncrementForYear(
+                                          index,
+                                          double.tryParse(value) ?? 0.0,
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(height: 10),
+
+                                    // Promotion Increment Field (only if promotions are enabled and valid)
+                                    if (controller.willReceivePromotion.value &&
+                                        controller.numberOfPromotions.value >
+                                            0 &&
+                                        controller.firstPromotionYear.value >
+                                            0 &&
+                                        controller.promotionInterval.value >
+                                            0 &&
+                                        dynamicInput.hasPromotion)
+                                      Column(
+                                        children: [
+                                          TextField(
+                                            keyboardType:
+                                                TextInputType.numberWithOptions(
+                                                    decimal: true),
+                                            decoration: InputDecoration(
+                                              labelText:
+                                                  'Year ${dynamicInput.year} - Promotion increment (%)'
+                                                      .tr,
+                                            ),
+                                            onChanged: (value) {
+                                              controller
+                                                  .updatePromotionIncrementForYear(
+                                                index,
+                                                double.tryParse(value) ?? 0.0,
+                                              );
+                                            },
+                                          ),
+                                          const SizedBox(height: 10),
+                                        ],
+                                      ),
+                                  ],
+                                );
+                              },
+                            ),
+                          );
+                        } else {
+                          return const SizedBox
+                              .shrink(); // Hide fields if Multi-Year Projection is off
+                        }
+                      }),
                     ],
                   );
                 } else {
@@ -387,10 +412,19 @@ class SalaryCalculationScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(width: 10),
-                    Text(
-                      "${'sar'.tr} ${controller.housingAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    Obx(() {
+                      if (!controller.isMultiYearProjection.value) {
+                        return Text(
+                          "${'sar'.tr} ${controller.housingAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        );
+                      }
+                      return SizedBox.shrink();
+                    }),
+                    // Text(
+                    //   "${'sar'.tr} ${controller.housingAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
+                    //   style: TextStyle(fontWeight: FontWeight.bold),
+                    // ),
                   ],
                 );
               }),
@@ -463,10 +497,21 @@ class SalaryCalculationScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(width: 10),
-                    Text(
-                      "${'sar'.tr} ${controller.transportationAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+
+                    Obx(() {
+                      if (!controller.isMultiYearProjection.value) {
+                        return Text(
+                          "${'sar'.tr} ${controller.transportationAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        );
+                      }
+                      return SizedBox.shrink();
+                    }),
+
+                    // Text(
+                    //   "${'sar'.tr} ${controller.transportationAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
+                    //   style: TextStyle(fontWeight: FontWeight.bold),
+                    // ),
                   ],
                 );
               }),
@@ -540,10 +585,21 @@ class SalaryCalculationScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(width: 10),
-                    Text(
-                      "${'sar'.tr} ${controller.socialSecurityAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+
+                    Obx(() {
+                      if (!controller.isMultiYearProjection.value) {
+                        return Text(
+                          "${'sar'.tr} ${controller.socialSecurityAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        );
+                      }
+                      return SizedBox.shrink();
+                    }),
+
+                    // Text(
+                    //   "${'sar'.tr} ${controller.socialSecurityAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
+                    //   style: TextStyle(fontWeight: FontWeight.bold),
+                    // ),
                   ],
                 );
               }),
