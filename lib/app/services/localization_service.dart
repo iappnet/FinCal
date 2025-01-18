@@ -1,18 +1,20 @@
-import 'dart:convert'; // To decode JSON files
+import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // To load JSON files
+import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 
 class LocalizationService extends Translations {
   static Locale? locale = Locale('en', 'US'); // Default to English
   static Locale fallbackLocale = Locale('en', 'US');
   static final langs = ['English', 'العربية'];
-
   static final locales = [
     Locale('en', 'US'),
     Locale('ar', 'SA'),
   ];
   static Map<String, Map<String, String>> localizedStrings = {};
+  static final FlutterSecureStorage storage = FlutterSecureStorage();
 
   // Load JSON files dynamically
   static Future<void> loadJSON() async {
@@ -22,28 +24,81 @@ class LocalizationService extends Translations {
       localizedStrings['en_US'] = Map<String, String>.from(json.decode(enData));
       localizedStrings['ar_SA'] = Map<String, String>.from(json.decode(arData));
     } catch (e) {
-      // print('Error loading localization files: $e');
+      // Handle error if necessary
     }
   }
 
   @override
   Map<String, Map<String, String>> get keys => localizedStrings;
 
-  void changeLocale(String lang) {
-    final selectedLocale = _getLocaleFromLanguage(lang);
-    locale = selectedLocale; // Update the static locale
-    Get.updateLocale(selectedLocale);
+  // Initialize the locale based on device language or stored preference
+  static Future<void> initializeLocale() async {
+    // Retrieve stored language preference, if any
+    final savedLang = await storage.read(key: 'selectedLanguage');
+
+    if (savedLang != null) {
+      locale = getLocaleFromLanguage(savedLang);
+    } else {
+      // Detect device language
+      final deviceLanguage = window.locale.languageCode;
+
+      if (deviceLanguage == 'ar') {
+        locale = Locale('ar', 'SA');
+      } else {
+        locale = Locale('en', 'US');
+      }
+
+      // Save the detected language as default
+      await storage.write(
+          key: 'selectedLanguage',
+          value: locale!.languageCode == 'ar' ? 'العربية' : 'English');
+    }
+
+    Get.updateLocale(locale!);
   }
 
-  Locale _getLocaleFromLanguage(String lang) {
-    for (int i = 0; i < langs.length; i++) {
-      if (lang == langs[i]) return locales[i];
+  static Locale getLocaleFromLanguage(String language) {
+    switch (language) {
+      case 'English':
+        return Locale('en', 'US');
+      case 'العربية':
+        return Locale('ar', 'SA');
+      default:
+        return Locale('en', 'US'); // Default language
     }
-    return fallbackLocale;
+  }
+
+  static Future<void> changeLocale(String language) async {
+    // Update the app's locale
+    locale = getLocaleFromLanguage(language);
+    Get.updateLocale(locale!);
+
+    // Save the selected language to persistent storage
+    await storage.write(key: 'selectedLanguage', value: language);
+  }
+
+  // Retrieve locale based on stored language
+  static Future<void> loadStoredLocale() async {
+    // Retrieve the stored language or default to English
+    final savedLang = await storage.read(key: 'selectedLanguage') ?? 'English';
+    locale = getLocaleFromLanguage(savedLang);
+
+    // Update the app's locale
+    Get.updateLocale(locale!);
   }
 
   static String getCurrentLanguage() {
-    // Fallback to English if locale is null
-    return locale?.languageCode == 'ar' ? 'العربية' : 'English';
+    // This should return the current app language as a string
+    Locale currentLocale = Get.locale ?? Locale('en', 'US');
+    return currentLocale.languageCode == 'ar' ? 'العربية' : 'English';
+  }
+
+  // Helper to reorder language list with the current language on top
+  static List<String> reorderLanguages() {
+    String currentLang = getCurrentLanguage();
+    List<String> reorderedLangs = List.from(langs);
+    reorderedLangs.remove(currentLang);
+    reorderedLangs.insert(0, currentLang);
+    return reorderedLangs;
   }
 }

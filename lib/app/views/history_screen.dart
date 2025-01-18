@@ -10,6 +10,9 @@ class HistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Ensure data refreshes when navigating to this screen
+    controller.fetchCalculations();
+
     return Scaffold(
       appBar: SharedAppBar(
         title: 'calculation_history'.tr,
@@ -32,9 +35,14 @@ class HistoryScreen extends StatelessWidget {
             final calculation = controller.calculations[index];
             return Card(
               child: ListTile(
-                title: Text(calculation.calculationType),
+                title: Text(
+                  calculation.calculationType,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 subtitle: Text(
-                    'Date: ${calculation.date.toLocal().toString().split(' ')[0]}'),
+                  'Date: ${calculation.date.toLocal().toString().split(' ')[0]}',
+                  overflow: TextOverflow.ellipsis,
+                ),
                 trailing: IconButton(
                   icon: Icon(Icons.delete, color: Colors.red),
                   onPressed: () => _showDeleteDialog(context, calculation.id!),
@@ -56,7 +64,7 @@ class HistoryScreen extends StatelessWidget {
         content: Text("delete_confirmation".tr), // Localized
         actions: [
           TextButton(
-            child: Text("delete_confirmation".tr), // Localized
+            child: Text("cancel".tr), // Localized
             onPressed: () => Navigator.of(ctx).pop(),
           ),
           TextButton(

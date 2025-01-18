@@ -31,6 +31,8 @@ void main() async {
 
   // Load Localization JSON files before app launch
   await LocalizationService.loadJSON();
+  // Load saved language settings
+  await LocalizationService.initializeLocale();
 
   runApp(MyApp());
 }

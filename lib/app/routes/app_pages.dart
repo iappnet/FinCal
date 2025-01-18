@@ -1,10 +1,10 @@
+import 'package:fincals/app/views/personal_finance_view.dart';
 import 'package:fincals/main.dart';
 import 'package:get/get.dart';
 import '../bindings/salary_calculation_binding.dart'; // Create this if needed
 import '../views/calculation_details_screen.dart';
 import '../views/history_screen.dart';
 import '../views/home_screen.dart';
-import '../views/investment_calculation_screen.dart';
 import '../views/loan_calculation_screen.dart';
 import '../views/salary_calculation_screen.dart';
 import '../views/settings_screen.dart'; // Import the MainScreen
@@ -43,9 +43,8 @@ class AppPages {
       page: () => SettingsScreen(),
     ),
     GetPage(
-      name: _Paths.investmentCalculation,
-      page: () =>
-          InvestmentCalculation(title: 'Investment Calculation Coming Soon'),
+      name: _Paths.personalFinanceView,
+      page: () => PersonalFinanceView(),
     ),
     GetPage(
       name: _Paths.loanCalculation,

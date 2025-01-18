@@ -10,6 +10,7 @@ abstract class Routes {
   static const settings = _Paths.settings;
   static const investmentCalculation = _Paths.investmentCalculation;
   static const loanCalculation = _Paths.loanCalculation;
+  static const personalFinanceView = _Paths.personalFinanceView;
 }
 
 abstract class _Paths {
@@ -22,4 +23,5 @@ abstract class _Paths {
   static const settings = '/settings';
   static const investmentCalculation = '/investment-calculation';
   static const loanCalculation = '/loan-calculation';
+  static const personalFinanceView = '/personal-Finance';
 }

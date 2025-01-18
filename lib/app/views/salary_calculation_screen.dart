@@ -67,14 +67,9 @@ class SalaryCalculationScreen extends StatelessWidget {
                       Spacer(),
                       Switch(
                         value: controller.hasRaise.value,
-                        // onChanged: (value) {
-                        //   controller.toggleRaise(value);
-                        // },
-                        onChanged: controller.isMultiYearProjection.value
-                            ? null // Disable the toggle when Multi-Year Projection is on
-                            : (value) {
-                                controller.toggleRaise(value);
-                              },
+                        onChanged: (value) {
+                          controller.toggleRaise(value);
+                        },
                       ),
                     ],
                   )),
@@ -107,9 +102,6 @@ class SalaryCalculationScreen extends StatelessWidget {
                         onChanged: (value) {
                           controller.updateRaisePercentage(
                               double.tryParse(value) ?? 0.0);
-                          if (controller.hasRaise.value) {
-                            controller.isMultiYearProjection.value = false;
-                          }
                         },
                         onSubmitted: (_) {
                           FocusScope.of(context)
@@ -133,212 +125,7 @@ class SalaryCalculationScreen extends StatelessWidget {
                 }
               }),
 
-              const SizedBox(height: 10),
-
-              // Multi-Year Projection Toggle
-              Obx(() => Row(
-                    children: [
-                      Text("Calculate salary for multiple years?".tr),
-                      Spacer(),
-                      Switch(
-                        value: controller.isMultiYearProjection.value,
-                        onChanged: (value) {
-                          controller.toggleMultiYearProjection(value);
-                          if (controller.isMultiYearProjection.value) {
-                            controller.hasRaise.value = false;
-                            controller.clearRaiseFields();
-                          }
-                        },
-                      ),
-                    ],
-                  )),
-              const SizedBox(height: 10),
-              // Multi-Year Projection Inputs (Visible if Toggle is On)
-              Obx(() {
-                if (controller.isMultiYearProjection.value) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Number of Years Input
-                      TextField(
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: 'Number of years (1-10)'.tr,
-                        ),
-                        onChanged: (value) {
-                          final int years = int.tryParse(value) ?? 0;
-                          if (years >= 1 && years <= 10) {
-                            controller.updateNumberOfYears(years);
-                          } else {
-                            Get.snackbar(
-                              'Invalid Input',
-                              'Please enter a number between 1 and 10.',
-                              snackPosition: SnackPosition.BOTTOM,
-                            );
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 10),
-
-                      // Will you receive any promotions?
-                      Row(
-                        children: [
-                          Text("Will you receive any promotion?".tr),
-                          Spacer(),
-                          Switch(
-                            value: controller.willReceivePromotion.value,
-                            onChanged: (value) {
-                              controller.togglePromotion(value);
-                            },
-                          ),
-                        ],
-                      ),
-                      if (controller.willReceivePromotion.value)
-                        Column(
-                          children: [
-                            // Number of Promotions
-                            TextField(
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                labelText:
-                                    'How many promotions will you receive?'.tr,
-                              ),
-                              onChanged: (value) {
-                                controller.updateNumberOfPromotions(
-                                    int.tryParse(value) ?? 0);
-                              },
-                            ),
-                            const SizedBox(height: 10),
-
-                            // First Promotion Year
-                            TextField(
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                labelText: 'Enter the first promotion year'.tr,
-                              ),
-                              onChanged: (value) {
-                                controller.updateFirstPromotionYear(
-                                    int.tryParse(value) ?? 0);
-                              },
-                            ),
-                            const SizedBox(height: 10),
-
-                            // Promotion Interval
-                            TextField(
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                labelText: 'Promotion interval (in years)'.tr,
-                              ),
-                              onChanged: (value) {
-                                controller.updatePromotionInterval(
-                                    int.tryParse(value) ?? 0);
-                              },
-                            ),
-                            const SizedBox(height: 10),
-                          ],
-                        ),
-
-                      // Result Scope Dropdown
-                      DropdownButton<String>(
-                        value: controller.resultScope.value,
-                        onChanged: (value) {
-                          if (value != null) {
-                            controller.updateResultScope(value);
-                          }
-                        },
-                        items: [
-                          DropdownMenuItem(
-                              value: 'lastYear',
-                              child: Text('Last Year Only'.tr)),
-                          DropdownMenuItem(
-                              value: 'allYears', child: Text('All Years'.tr)),
-                        ],
-                        hint: Text('Select result scope'.tr),
-                      ),
-                      const SizedBox(height: 10),
-                      // Dynamically Generated Increment and Promotion Inputs
-                      Obx(() {
-                        // Ensure Multi-Year Projection is enabled and Number of Years is valid
-                        if (controller.isMultiYearProjection.value &&
-                            controller.numberOfYears.value > 0) {
-                          return Column(
-                            children: List.generate(
-                              controller.dynamicInputs.length,
-                              (index) {
-                                final dynamicInput =
-                                    controller.dynamicInputs[index];
-
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // Annual Increment Field (always displayed for each year)
-                                    TextField(
-                                      keyboardType:
-                                          TextInputType.numberWithOptions(
-                                              decimal: true),
-                                      decoration: InputDecoration(
-                                        labelText:
-                                            'Year ${dynamicInput.year} - Annual increment (%)'
-                                                .tr,
-                                      ),
-                                      onChanged: (value) {
-                                        controller.updateAnnualIncrementForYear(
-                                          index,
-                                          double.tryParse(value) ?? 0.0,
-                                        );
-                                      },
-                                    ),
-                                    const SizedBox(height: 10),
-
-                                    // Promotion Increment Field (only if promotions are enabled and valid)
-                                    if (controller.willReceivePromotion.value &&
-                                        controller.numberOfPromotions.value >
-                                            0 &&
-                                        controller.firstPromotionYear.value >
-                                            0 &&
-                                        controller.promotionInterval.value >
-                                            0 &&
-                                        dynamicInput.hasPromotion)
-                                      Column(
-                                        children: [
-                                          TextField(
-                                            keyboardType:
-                                                TextInputType.numberWithOptions(
-                                                    decimal: true),
-                                            decoration: InputDecoration(
-                                              labelText:
-                                                  'Year ${dynamicInput.year} - Promotion increment (%)'
-                                                      .tr,
-                                            ),
-                                            onChanged: (value) {
-                                              controller
-                                                  .updatePromotionIncrementForYear(
-                                                index,
-                                                double.tryParse(value) ?? 0.0,
-                                              );
-                                            },
-                                          ),
-                                          const SizedBox(height: 10),
-                                        ],
-                                      ),
-                                  ],
-                                );
-                              },
-                            ),
-                          );
-                        } else {
-                          return const SizedBox
-                              .shrink(); // Hide fields if Multi-Year Projection is off
-                        }
-                      }),
-                    ],
-                  );
-                } else {
-                  return const SizedBox.shrink();
-                }
-              }),
               SizedBox(height: 10),
-
               // Housing Allowance Input
               Obx(() {
                 final TextEditingController housingController =
@@ -412,19 +199,10 @@ class SalaryCalculationScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(width: 10),
-                    Obx(() {
-                      if (!controller.isMultiYearProjection.value) {
-                        return Text(
-                          "${'sar'.tr} ${controller.housingAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        );
-                      }
-                      return SizedBox.shrink();
-                    }),
-                    // Text(
-                    //   "${'sar'.tr} ${controller.housingAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
-                    //   style: TextStyle(fontWeight: FontWeight.bold),
-                    // ),
+                    Text(
+                      "${'sar'.tr} ${controller.housingAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ],
                 );
               }),
@@ -497,21 +275,10 @@ class SalaryCalculationScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(width: 10),
-
-                    Obx(() {
-                      if (!controller.isMultiYearProjection.value) {
-                        return Text(
-                          "${'sar'.tr} ${controller.transportationAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        );
-                      }
-                      return SizedBox.shrink();
-                    }),
-
-                    // Text(
-                    //   "${'sar'.tr} ${controller.transportationAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
-                    //   style: TextStyle(fontWeight: FontWeight.bold),
-                    // ),
+                    Text(
+                      "${'sar'.tr} ${controller.transportationAllowanceAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ],
                 );
               }),
@@ -585,26 +352,35 @@ class SalaryCalculationScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(width: 10),
-
-                    Obx(() {
-                      if (!controller.isMultiYearProjection.value) {
-                        return Text(
-                          "${'sar'.tr} ${controller.socialSecurityAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        );
-                      }
-                      return SizedBox.shrink();
-                    }),
-
-                    // Text(
-                    //   "${'sar'.tr} ${controller.socialSecurityAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
-                    //   style: TextStyle(fontWeight: FontWeight.bold),
-                    // ),
+                    Text(
+                      "${'sar'.tr} ${controller.socialSecurityAmount.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '')}",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ],
                 );
               }),
+              SizedBox(height: 10),
+              Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                ElevatedButton(
+                  onPressed: () => controller.addAllowance(context),
+                  child: Icon(Icons.add),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(40, 40), // Width and height
+                    padding: EdgeInsets.zero, // Remove default padding
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(8.0), // Rounded corners
+                    ),
+                  ),
+                ),
+                SizedBox(width: 7),
+                Text(
+                  'Add More Allowance',
+                  style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500),
+                ),
+              ]),
 
-              SizedBox(height: 20),
+              SizedBox(height: 10),
 
               // Allowances List
               Obx(() => Column(
@@ -737,10 +513,10 @@ class SalaryCalculationScreen extends StatelessWidget {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => controller.addAllowance(context),
-        child: Icon(Icons.add),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => controller.addAllowance(context),
+      //   child: Icon(Icons.add),
+      // ),
     );
   }
 

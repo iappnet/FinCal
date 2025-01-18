@@ -1,5 +1,7 @@
 {
     "cSpell.words": [
+        "appbar",
+        "AUTOINCREMENT",
         "Cupertino",
         "dontwarn",
         "errorprone",
@@ -8,10 +10,12 @@
         "Getx",
         "iappsnet",
         "javax",
+        "mainapp",
         "proguard",
         "Schyler",
         "socialinsurance",
         "sqflite",
-        "updatesocialinsurance"
+        "updatesocialinsurance",
+        "العربية"
     ]
 }

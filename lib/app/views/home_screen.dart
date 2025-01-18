@@ -22,6 +22,10 @@ class HomeScreen extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
+        textStyle: const TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       // AppBar(
       //   title: Text('Financial Tools'),
@@ -67,15 +71,15 @@ class HomeScreen extends StatelessWidget {
                       Get.toNamed(Routes.salaryCalculation);
                     },
                   ),
-                  // _buildNavigationCard(
-                  //   context,
-                  //   title: 'Investment Calculation',
-                  //   description: 'Plan your investments.',
-                  //   icon: Icons.trending_up,
-                  //   onTap: () {
-                  //     Get.toNamed(Routes.investmentCalculation);
-                  //   },
-                  // ),
+                  _buildNavigationCard(
+                    context,
+                    title: 'personal_finance_view_title'.tr,
+                    description: 'plan_your_financial_obligations'.tr,
+                    icon: Icons.monetization_on,
+                    onTap: () {
+                      Get.toNamed(Routes.personalFinanceView);
+                    },
+                  ),
                   // _buildNavigationCard(
                   //   context,
                   //   title: 'Loan Calculation',
@@ -118,7 +122,7 @@ class HomeScreen extends StatelessWidget {
           return Card(
             elevation: 4,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(20),
             ),
             child: Padding(
               // padding: const EdgeInsets.all(16.0),

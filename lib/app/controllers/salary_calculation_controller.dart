@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -23,26 +25,24 @@ class SalaryCalculationController extends GetxController {
   var hasRaise = false.obs; // Toggle for raise
   var raisePercentage = 0.0.obs; // Percentage input for raise
   var raiseAmount = 0.0.obs; // Calculated raise value
-  var isMultiYearProjection = false.obs;
-  var numberOfYears = 0.obs;
-  var firstPromotionYear = 0.obs;
-  var promotionInterval = 0.obs;
-  var annualIncrement = 0.0.obs;
-  var promotionIncrement = 0.0.obs;
-
-  var resultScope = 'allYears'.obs;
-  var willReceivePromotion = false.obs;
-
-  var multiYearResults = <SalaryProjectionResult>[].obs;
-  List<SalaryProjectionResult> get dynamicInputs => multiYearResults;
 
   // Allowance-specific percentages
   var housingAllowancePercentage = 25.0.obs;
   var transportationAllowancePercentage = 10.0.obs;
 
+  // List to store base salaries for each year
+  var yearlyBaseSalaries = <double>[].obs;
+
+  // List to store promotion increments for each year
+  var yearlyPromotionIncrements = <double>[].obs;
+
   // State for results box visibility
   var isResultsVisible = false.obs;
-  var numberOfPromotions = 0.obs;
+
+  // Reactive variables for promotions
+  var hasPromotions = false.obs; // Toggle for promotions
+
+  var promotionIncrements = <double>[].obs; // Promotion increment percentages
 
   // Calculated Values
   double get housingAllowanceAmount =>
@@ -105,34 +105,6 @@ class SalaryCalculationController extends GetxController {
     _updateResults();
   }
 
-  void updateResultScope(String scope) {
-    resultScope.value = scope;
-    update();
-  }
-
-  void togglePromotion(bool value) {
-    willReceivePromotion.value = value;
-    if (!value) {
-      numberOfPromotions.value = 0;
-      firstPromotionYear.value = 0;
-      promotionInterval.value = 0;
-    }
-  }
-
-  void updateNumberOfPromotions(int value) {
-    if (value < 0 || value > 10) {
-      Get.snackbar(
-          'Invalid Input', 'Number of promotions must be between 0 and 10.');
-      return;
-    }
-    numberOfPromotions.value = value;
-  }
-
-  // void _updateBaseSalaryWithRaise() {
-  //   double newBaseSalary = baseSalary.value + raiseAmount.value;
-  //   updateBaseSalary(newBaseSalary); // Reuse existing method
-  // }
-
   // Update methods
   void updateBaseSalary(double value) {
     // Set original value whenever base salary is updated
@@ -144,37 +116,6 @@ class SalaryCalculationController extends GetxController {
       updateRaisePercentage(raisePercentage.value);
     } else {
       _updateResults();
-    }
-  }
-
-  void clearRaiseFields() {
-    raisePercentage.value = 0.0;
-    raiseAmount.value = 0.0;
-  }
-
-  void updateAnnualIncrementForYear(int yearIndex, double increment) {
-    if (yearIndex >= 0 && yearIndex < multiYearResults.length) {
-      multiYearResults[yearIndex] = SalaryProjectionResult(
-        year: multiYearResults[yearIndex].year,
-        hasPromotion: multiYearResults[yearIndex].hasPromotion,
-        preDeductionSalary: multiYearResults[yearIndex].preDeductionSalary,
-        postDeductionSalary: multiYearResults[yearIndex].postDeductionSalary +
-            increment, // Example logic for increment
-      );
-      update(); // Notify listeners
-    }
-  }
-
-  void updatePromotionIncrementForYear(int yearIndex, double increment) {
-    if (yearIndex >= 0 && yearIndex < multiYearResults.length) {
-      multiYearResults[yearIndex] = SalaryProjectionResult(
-        year: multiYearResults[yearIndex].year,
-        hasPromotion: multiYearResults[yearIndex].hasPromotion,
-        preDeductionSalary: multiYearResults[yearIndex].preDeductionSalary,
-        postDeductionSalary: multiYearResults[yearIndex].postDeductionSalary +
-            increment, // Example logic for increment
-      );
-      update(); // Notify listeners
     }
   }
 
@@ -209,147 +150,6 @@ class SalaryCalculationController extends GetxController {
 
   void editAllowance(BuildContext context, int index) {
     _showAllowanceBottomSheet(context, index: index);
-  }
-
-  void toggleMultiYearProjection(bool value) {
-    isMultiYearProjection.value = value;
-
-    if (value) {
-      hasRaise.value = false;
-      clearRaiseFields();
-      if (firstPromotionYear.value == 0 || promotionInterval.value == 0) {
-        Get.snackbar(
-            'No Promotions', 'Projection will proceed without promotions.');
-      }
-    } else {
-      numberOfYears.value = 0;
-      firstPromotionYear.value = 0;
-      promotionInterval.value = 0;
-      multiYearResults.clear();
-    }
-
-    _updateResults();
-  }
-
-  void clearRaisesFields() {
-    raisePercentage.value = 0.0;
-    raiseAmount.value = 0.0;
-    baseSalary.value = originalBaseSalary.value; // Reset to original
-  }
-
-  void updateNumberOfYears(int years) {
-    numberOfYears.value = years;
-
-    if (years > 0) {
-      dynamicInputs.assignAll(
-        List.generate(
-          years,
-          (index) => SalaryProjectionResult(
-            year: index + 1,
-            hasPromotion: willReceivePromotion.value &&
-                numberOfPromotions.value > 0 &&
-                firstPromotionYear.value > 0 &&
-                promotionInterval.value > 0 &&
-                ((index + 1) >= firstPromotionYear.value &&
-                    ((index + 1) - firstPromotionYear.value) %
-                            promotionInterval.value ==
-                        0),
-            preDeductionSalary: 0.0,
-            postDeductionSalary: 0.0,
-          ),
-        ),
-      );
-    } else {
-      dynamicInputs.clear();
-    }
-  }
-
-  void updateFirstPromotionYear(int year) {
-    if (year <= 0) {
-      Get.snackbar('Invalid Input', 'Enter a valid year.');
-      return;
-    }
-    firstPromotionYear.value = year;
-    updateDynamicFields();
-  }
-
-  void updatePromotionInterval(int interval) {
-    if (interval <= 0) {
-      Get.snackbar('Invalid Input', 'Interval must be greater than 0.');
-      return;
-    }
-    promotionInterval.value = interval;
-    updateDynamicFields();
-  }
-
-  void updateAnnualIncrement(double increment) {
-    annualIncrement.value = increment;
-    calculateMultiYearProjection(); // or true based on your logic
-  }
-
-  void updatePromotionIncrement(double increment) {
-    promotionIncrement.value = increment;
-    calculateMultiYearProjection(); // or true based on your logic
-  }
-
-  void calculateMultiYearProjection() {
-    if (numberOfYears.value == 0 || baseSalary.value == 0.0) {
-      multiYearResults.clear();
-      return;
-    }
-
-    multiYearResults.clear();
-
-    double currentSalary = baseSalary.value;
-    for (int year = 1; year <= numberOfYears.value; year++) {
-      double preDeductionSalary = currentSalary;
-
-      // Apply annual increment
-      currentSalary += currentSalary * (annualIncrement.value / 100);
-
-      // Check if this year is a promotion year
-      bool hasPromotion = (year == firstPromotionYear.value ||
-          (year > firstPromotionYear.value &&
-              promotionInterval.value > 0 && // Avoid division by zero
-              (year - firstPromotionYear.value) % promotionInterval.value ==
-                  0));
-
-      // Apply promotion increment if applicable
-      if (hasPromotion) {
-        currentSalary += currentSalary * (promotionIncrement.value / 100);
-      }
-
-      // Calculate allowances and deductions for the year
-      double housingAllowance =
-          currentSalary * (housingAllowancePercentage.value / 100);
-      double transportationAllowance =
-          currentSalary * (transportationAllowancePercentage.value / 100);
-      double socialDeduction = (currentSalary + housingAllowance) *
-          (socialinsurancePercentage.value / 100);
-
-      double postDeductionSalary = currentSalary +
-          housingAllowance +
-          transportationAllowance -
-          socialDeduction;
-
-      // Add to results
-      multiYearResults.add(SalaryProjectionResult(
-        year: year,
-        hasPromotion: hasPromotion,
-        preDeductionSalary: preDeductionSalary,
-        postDeductionSalary: postDeductionSalary,
-      ));
-    }
-
-    update();
-  }
-
-  void saveProjectionResults() {
-    // Implement saving logic
-  }
-
-  void shareProjectionResults() {
-    // Implement sharing logic
   }
 
   void _showAllowanceBottomSheet(BuildContext context, {int? index}) {
@@ -765,24 +565,4 @@ ${'generated_on'.tr}: ${DateTime.now().toLocal()}
       return null;
     }
   }
-}
-
-class SalaryProjectionResult {
-  final int year;
-  final bool hasPromotion;
-  final double preDeductionSalary;
-  final double postDeductionSalary;
-
-  SalaryProjectionResult({
-    required this.year,
-    required this.hasPromotion,
-    required this.preDeductionSalary,
-    required this.postDeductionSalary,
-    required double baseSalary,
-    required housingAllowance,
-    required transportationAllowance,
-    required socialInsuranceDeduction,
-    required preDeductionTotal,
-    required postDeductionTotal,
-  });
 }

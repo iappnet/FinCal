@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../services/localization_service.dart';
+
 class SettingsController extends GetxController {
   final storage = FlutterSecureStorage();
 
@@ -30,6 +32,9 @@ class SettingsController extends GetxController {
     username.value = savedUsername ?? 'guest'.tr; // Use the translated default
     isFirstUse.value = firstUseValue == 'true';
     isAutoSaveImage.value = autoSaveValue == 'true';
+
+    // Load stored language
+    await LocalizationService.loadStoredLocale();
   }
 
   // Toggle dark mode
@@ -38,18 +43,20 @@ class SettingsController extends GetxController {
     await storage.write(key: 'darkMode', value: value.toString());
   }
 
-  // Save username
-  void saveUsername() async {
-    username.value = tempUsername.value.isNotEmpty
-        ? tempUsername.value
-        : 'guest'.tr; // Use localized "Guest" fallback
+// Save username
+  void saveUsername(String text) async {
+    // Update username with provided text or fallback to "guest"
+    username.value =
+        text.isNotEmpty ? text : 'guest'.tr; // Use localized "Guest" fallback
     await storage.write(key: 'username', value: username.value);
     isEditingName.value = false;
+
     // Mark as no longer the first use
     if (isFirstUse.value) {
       isFirstUse.value = false;
       await storage.write(key: 'isFirstUse', value: 'false');
     }
+
     // Notify user with a localized message
     Get.snackbar('success'.tr, 'username_updated'.tr);
   }
